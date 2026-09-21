@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Procedural Fleet Sheet Generator</title>
+    
+    <style>
+        body {
+            background-color: #0b0c10;
+            color: #ffffff;
+            font-family: 'Monaco', 'Courier New', monospace;
+            margin: 0;
+            padding: 20px;
+        }
+        h2 {
+            color: #ff9d42;
+            margin-top: 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 2px dashed #333;
+            padding-bottom: 10px;
+        }
+        .control-panel {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+        }
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        label {
+            font-size: 11px;
+            color: #888;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+        input {
+            background: #1f2128;
+            border: 1px solid #444;
+            color: #fff;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            width: 80px;
+        }
+        button {
+            background: #ff9d42;
+            color: #000;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: background 0.1s;
+        }
+        button:hover {
+            background: #ffb85c;
+        }
+        #fleet-container {
+            display: grid;
+            margin-top: 10px;
+            justify-content: flex-start;
+        }
+        .ship-card {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid #222;
+            border-radius: 4px;
+            width: 120px;
+            height: 120px;
+            position: relative;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .trait-badge {
+            position: absolute;
+            bottom: 3px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 8px;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            background: rgba(0, 0, 0, 0.75);
+            padding: 1px 0;
+        }
+    </style>
+    
+</head>
+<body>
+
+    <h2>🛰️ Procedural Fleet Sheet Generator</h2>
+
+    <!-- MINIMALIST UNIFIED TOOLBAR: NUMBERS ON LEFT, ACTION BUTTONS IN MIDDLE, TOGGLES ON RIGHT -->
+    <div class="control-panel" style="display: flex; gap: 20px; align-items: center; justify-content: space-between; padding: 12px 18px; min-width: 950px; box-sizing: border-box; background: rgba(255, 255, 255, 0.03); border: 1px solid #333; border-radius: 6px; margin-bottom: 20px;">
+        
+        <!-- LEFT SECTOR: HORIZONTAL COMPACT NUMBER ENTRIES -->
+        <div class="inputs-row" style="display: flex; gap: 12px; align-items: center;">
+            <div class="control-group" style="display: flex; flex-direction: column; gap: 3px;">
+                <label for="input-count" style="font-size: 9px; color: #888; text-transform: uppercase; font-weight: bold; letter-spacing: 0.5px;">Ships</label>
+                <input type="number" id="input-count" value="64" min="1" max="256" style="background: #1f2128; border: 1px solid #444; color: #fff; padding: 5px 8px; border-radius: 4px; font-family: monospace; width: 55px; font-size: 11px;">
+            </div>
+            <div class="control-group" style="display: flex; flex-direction: column; gap: 3px;">
+                <label for="input-columns" style="font-size: 9px; color: #888; text-transform: uppercase; font-weight: bold; letter-spacing: 0.5px;">Cols</label>
+                <input type="number" id="input-columns" value="8" min="1" max="24" style="background: #1f2128; border: 1px solid #444; color: #fff; padding: 5px 8px; border-radius: 4px; font-family: monospace; width: 45px; font-size: 11px;">
+            </div>
+            <div class="control-group" style="display: flex; flex-direction: column; gap: 3px;">
+                <label for="input-spacing" style="font-size: 9px; color: #888; text-transform: uppercase; font-weight: bold; letter-spacing: 0.5px;">Space</label>
+                <input type="number" id="input-spacing" value="6" min="0" max="50" style="background: #1f2128; border: 1px solid #444; color: #fff; padding: 5px 8px; border-radius: 4px; font-family: monospace; width: 45px; font-size: 11px;">
+            </div>
+            <div class="control-group" style="display: flex; flex-direction: column; gap: 3px;">
+                <label for="input-rotation" style="font-size: 9px; color: #888; text-transform: uppercase; font-weight: bold; letter-spacing: 0.5px;">Rot(°)</label>
+                <input type="number" id="input-rotation" value="0" min="0" max="360" style="background: #1f2128; border: 1px solid #444; color: #fff; padding: 5px 8px; border-radius: 4px; font-family: monospace; width: 45px; font-size: 11px;">
+            </div>
+            <div class="control-group" style="display: flex; flex-direction: column; gap: 3px;">
+                <label for="input-scale" style="font-size: 9px; color: #888; text-transform: uppercase; font-weight: bold; letter-spacing: 0.5px;">Scale(%)</label>
+                <input type="number" id="input-scale" value="100" min="0" max="300" style="background: #1f2128; border: 1px solid #444; color: #fff; padding: 5px 8px; border-radius: 4px; font-family: monospace; width: 55px; font-size: 11px;">
+            </div>
+        </div>
+
+        <!-- MIDDLE SECTOR: TIGHTLY PACKED ACTION BUTTONS -->
+        <div class="buttons-center-cluster" style="display: flex; gap: 8px; align-items: center; justify-content: center; flex-grow: 1; max-width: 340px; margin: 0 10px;">
+            <button onclick="generateFleetSheet()" style="background: #ff9d42; color: #000; border: none; padding: 8px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 10px; flex: 1; white-space: nowrap;">Forge Fleet</button>
+            <button onclick="exportFleetAsPNG()" style="background: #ff3d00; color: #fff; border: none; padding: 8px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 10px; flex: 1; white-space: nowrap;">Export PNG</button>
+            <button onclick="exportFleetAsSVG()" style="display: none;">🧬 SVG</button>
+        </div>
+
+        <!-- RIGHT SECTOR: REWORKED 4-ROW COMPACT VARIATION MATRIX CONTAINER (INTUITIVE TOGGLES) -->
+        <div class="toggles-right-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px 15px; background: rgba(0,0,0,0.2); padding: 8px 12px; border-radius: 4px; border: 1px solid #222; font-size: 10px; width: max-content; box-sizing: border-box;">
+            <!-- ROW 1: ARSENAL & GLOBAL THEMING CONTROLS -->
+            <label style="display: flex; align-items: center; gap: 4px; cursor: pointer; color: #ff9d42; font-weight: bold; white-space: nowrap;">
+                <input type="checkbox" id="toggle-label" checked style="width: auto; margin: 0; transform: scale(0.85);"> Weapon Labels
+            </label>
+            <label style="display: flex; align-items: center; gap: 4px; cursor: pointer; color: #77cc99; font-weight: bold; white-space: nowrap;">
+                <input type="checkbox" id="toggle-single-color" style="width: auto; margin: 0; transform: scale(0.85);"> Single Color Scheme
+            </label>
+            <div style="display: none;"></div> <!-- Grid alignment buffer filler -->
+
+            <!-- ROW 2: SPATIAL ORIENTATION MUTATIONS POOL -->
+            <label style="display: flex; align-items: center; gap: 4px; cursor: pointer; color: #ff5555; font-weight: bold; white-space: nowrap;">
+                <input type="checkbox" id="allow-inverted" checked style="width: auto; margin: 0; transform: scale(0.85);"> Allow Inverted Wings
+            </label>
+            <label style="display: flex; align-items: center; gap: 4px; cursor: pointer; color: #ff5555; font-weight: bold; white-space: nowrap;">
+                <input type="checkbox" id="force-inverted" style="width: auto; margin: 0; transform: scale(0.85);"> Always Inverted Wings
+            </label>
+            <div style="display: none;"></div>
+
+            <!-- ROW 3: ALL INDIVIDUAL DETAILED CHASSIS WING VARIANTS -->
+            <label style="display: flex; align-items: center; gap: 4px; cursor: pointer; color: #ff5555; font-weight: bold; white-space: nowrap;">
+                <input type="checkbox" id="allow-slickback" checked style="width: auto; margin: 0; transform: scale(0.85);"> Allow Slickback (1)
+            </label>
+            <label style="display: flex; align-items: center; gap: 4px; cursor: pointer; color: #ff5555; font-weight: bold; white-space: nowrap;">
+                <input type="checkbox" id="allow-quad-pods" checked style="width: auto; margin: 0; transform: scale(0.85);"> Allow Quad Flaps (2)
+            </label>
+            <label style="display: flex; align-items: center; gap: 4px; cursor: pointer; color: #ff5555; font-weight: bold; white-space: nowrap;">
+                <input type="checkbox" id="allow-stinger" checked style="width: auto; margin: 0; transform: scale(0.85);"> Allow Stinger (3)
+            </label>
+            <label style="display: flex; align-items: center; gap: 4px; cursor: pointer; color: #ff5555; font-weight: bold; white-space: nowrap;">
+                <input type="checkbox" id="allow-triple-pods" checked style="width: auto; margin: 0; transform: scale(0.85);"> Allow Triple Pods (4)
+            </label>
+            <label style="display: flex; align-items: center; gap: 4px; cursor: pointer; color: #ff5555; font-weight: bold; white-space: nowrap;">
+                <input type="checkbox" id="allow-snub" checked style="width: auto; margin: 0; transform: scale(0.85);"> Allow Snub Wing (5)
+            </label>
+            <!-- NEW PROTOTYPE INPUT OPTIONS HOOKED UP SEAMLESSLY -->
+            <label style="display: flex; align-items: center; gap: 4px; cursor: pointer; color: #ff5555; font-weight: bold; white-space: nowrap;">
+                <input type="checkbox" id="allow-rectangular" checked style="width: auto; margin: 0; transform: scale(0.85);"> Allow Rect (6)
+            </label>
+            <label style="display: flex; align-items: center; gap: 4px; cursor: pointer; color: #ff5555; font-weight: bold; white-space: nowrap;">
+                <input type="checkbox" id="allow-v-sharp" checked style="width: auto; margin: 0; transform: scale(0.85);"> Allow Sharp V (7)
+            </label>
+
+            <div style="display: none;"></div>
+
+            <!-- ROW 4: FIXED INTUITIVE RENDER TOGGLES (Checked = Visible by default!) -->
+            <label style="display: flex; align-items: center; gap: 4px; cursor: pointer; color: #888; white-space: nowrap;">
+                <input type="checkbox" id="toggle-wings" checked style="width: auto; margin: 0; transform: scale(0.85);"> Show Wings Geometry
+            </label>
+            <label style="display: flex; align-items: center; gap: 4px; cursor: pointer; color: #888; white-space: nowrap;">
+                <input type="checkbox" id="toggle-pods" checked style="width: auto; margin: 0; transform: scale(0.85);"> Show Gun Pods
+            </label>
+            <label style="display: flex; align-items: center; gap: 4px; cursor: pointer; color: #888; white-space: nowrap;">
+                <input type="checkbox" id="toggle-hull" checked style="width: auto; margin: 0; transform: scale(0.85);"> Show Fuselage Core
+            </label>
+            <label style="display: flex; align-items: center; gap: 4px; cursor: pointer; color: #888; white-space: nowrap;">
+                <input type="checkbox" id="toggle-decals" checked style="width: auto; margin: 0; transform: scale(0.85);"> Show Decal Accents
+            </label>
+            <label style="display: flex; align-items: center; gap: 4px; cursor: pointer; color: #888; white-space: nowrap;">
+                <input type="checkbox" id="toggle-canopy" checked style="width: auto; margin: 0; transform: scale(0.85);"> Show Cockpit Visor
+            </label>
+            <label style="display: flex; align-items: center; gap: 4px; cursor: pointer; color: #888; white-space: nowrap;">
+                <input type="checkbox" id="toggle-thrusters" checked style="width: auto; margin: 0; transform: scale(0.85);"> Show Engine Jets
+            </label>
+        </div>
+
+
+    </div>
+
+    <!-- CENTERED FLEET CONTAINER AREA WRAPPER -->
+    <div style="display: flex; width: 100%; justify-content: center; box-sizing: border-box; padding-top: 10px;">
+        <div id="fleet-container" style="display: grid; justify-content: center;"></div>
+    </div>
+
+
+    <script>
+        const PALLETS = ['#e1c6e5', '#e5e3e7', '#e4e8e3', '#ffd700', '#ff9d42', '#77cc99', '#00e5ff', '#ff3d00'];
+        const ACCENTS = ['#d4b0db', '#ff9d42', '#77cc99', '#fff200', '#ffffff', '#00e5ff'];
+
+ function executeProceduralChassisPaths(ctx, cache) {
+    if (!ctx || !cache) return;
+
+    // =========================================================================
+    // MASTER UI CHECKBOX VARIABLE BINDINGS (CRASH-PROOF SYNCHRONIZATION)
+    // =========================================================================
+    // These variables MUST point exactly to your HTML element IDs to prevent script crashes!
+    const showWings = document.getElementById('toggle-wings') ? document.getElementById('toggle-wings').checked : true;
+    const showPods = document.getElementById('toggle-pods') ? document.getElementById('toggle-pods').checked : true;
+    const showHull = document.getElementById('toggle-hull') ? document.getElementById('toggle-hull').checked : true;
+    const showDecals = document.getElementById('toggle-decals') ? document.getElementById('toggle-decals').checked : true;
+    const showThrusters = document.getElementById('toggle-thrusters') ? document.getElementById('toggle-thrusters').checked : true;
+    
+    // FIXED: Maps your id="toggle-canopy" checkbox state cleanly to the showCanopy variable!
+    const showCanopy = document.getElementById('toggle-canopy') ? document.getElementById('toggle-canopy').checked : true;
+            // =========================================================================
+        // WING PATH MATH SUBROUTINE (FIXED FOR FULL RESOLUTION SPHERICAL FUEL PODS)
+        // =========================================================================
+        function drawComponentSide(isLeft, type, invert, isSilhouette) {
+            ctx.save();
+            if (isLeft) ctx.scale(-1, 1); 
+            if (invert) ctx.scale(1, -1);  
+
+            if (isSilhouette) {
+                ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 3;
+            } else {
+                ctx.fillStyle = cache.hullColor; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1.5;
+            }
+
+            const wM = cache.wingWidthMult;
+            const pM = cache.podLengthMult;
+
+            if (type === 1) {
+                // Type 1: Slickback Razor Wing Geometry
+                ctx.beginPath(); ctx.moveTo(10, -20 * pM);
+                if (invert) {
+                    ctx.bezierCurveTo(34 * wM, 10 * pM, 54 * wM, 26 * pM, 54 * wM, 34 * pM);
+                    ctx.bezierCurveTo(54 * wM, 40 * pM, 42 * wM, 40 * pM, 24 * wM, 38 * pM);
+                } else {
+                    ctx.lineTo(54 * wM, 40 * pM); ctx.lineTo(24 * wM, 38 * pM);
+                }
+                ctx.lineTo(10, 42 * pM); ctx.lineTo(0, 44 * pM); ctx.fill(); ctx.stroke();
+            } 
+                        else if (type === 2) {
+                // =========================================================================
+                // FIXED TYPE 2: QUAD FLAPS (FRONT POD ON TOP LAYER OVERRIDE)
+                // =========================================================================
+                // Draws the rear pod first, then the front pod last so it stacks perfectly on top!
+                ctx.beginPath();
+                ctx.arc(16 * wM, 22 * pM, 17 * pM, 0, Math.PI * 2);
+                ctx.fill(); ctx.stroke();
+
+                ctx.beginPath();
+                ctx.arc(22 * wM, -4 * pM, 21 * pM, 0, Math.PI * 2);
+                ctx.fill(); ctx.stroke();
+            } 
+            else if (type === 3) {
+                ctx.beginPath(); ctx.moveTo(10, -20 * pM); ctx.lineTo(38 * wM, 4 * pM); ctx.lineTo(38 * wM, -32 * pM); ctx.lineTo(44 * wM, 26 * pM); ctx.lineTo(32 * wM, 22 * pM); ctx.lineTo(0, 44 * pM);
+                ctx.fill(); ctx.stroke();
+            } 
+            else if (type === 4) {
+                // =========================================================================
+                // FIXED TYPE 4: TRIPLE STACKED PODS (MIDDLE POD ON TOP LAYER OVERRIDE)
+                // =========================================================================
+                // Draws the top and bottom pods first, then layers the middle cluster pod last!
+                ctx.beginPath();
+                ctx.arc(20 * wM, -14 * pM, 13 * pM, 0, Math.PI * 2); 
+                ctx.fill(); ctx.stroke();
+
+                ctx.beginPath();
+                ctx.arc(20 * wM, 24 * pM, 13 * pM, 0, Math.PI * 2); 
+                ctx.fill(); ctx.stroke();
+
+                ctx.beginPath();
+                ctx.arc(22 * wM, 6 * pM, 16 * pM, 0, Math.PI * 2);  
+                ctx.fill(); ctx.stroke();
+            } else if (type === 5) {
+                // Type 5: Snub Wing Minimalist Variant Panel Base
+                ctx.beginPath();
+                ctx.moveTo(10, -18 * pM);
+                ctx.lineTo(22 * wM, -18 * pM);
+                ctx.lineTo(24 * wM, -14 * pM); 
+                ctx.lineTo(24 * wM, 34 * pM);
+                ctx.bezierCurveTo(24 * wM, 42 * pM, 14 * wM, 42 * pM, 12 * wM, 40 * pM);
+                ctx.lineTo(0, 44 * pM);
+                ctx.closePath();
+                ctx.fill(); ctx.stroke();
+            }
+
+                        // =========================================================================
+            // NEW TYPE 6: RECTANGULAR CARGO HOUSING (WITH SOLID BLACK ACCENT DISC DETAIL)
+            // =========================================================================
+            else if (type === 6) {
+                ctx.beginPath();
+                
+                // Establish geometric structural coordinate bounds
+                const innerX = 6;        
+                const outerX = 42 * wM;
+                const topY = -10 * pM;    
+                const bottomY = 32 * pM;
+                const cornerRadius = 3.5; 
+                const biteSize = 15 * wM; 
+                
+                // 1. Draw the primary wing panel base plate
+                ctx.moveTo(innerX, topY);
+                ctx.lineTo(outerX - biteSize, topY);
+                ctx.arcTo(outerX - biteSize, topY + biteSize, outerX, topY + biteSize, biteSize);
+                ctx.lineTo(outerX, topY + biteSize);
+                ctx.arcTo(outerX, bottomY, innerX, bottomY, cornerRadius);
+                ctx.arcTo(innerX, bottomY, innerX, topY, cornerRadius);
+                ctx.lineTo(innerX, bottomY);
+                ctx.lineTo(0, 44 * pM);
+                ctx.closePath();
+                ctx.fill(); 
+                ctx.stroke();
+
+                // 2. FIXED: INJECT SOLID CHARCOAL MECHANICAL DETAILED LAYER DISC
+                // Only renders this core tech accent detail if the ship is drawn in full color
+                if (!isSilhouette) {
+                    ctx.save();
+                    ctx.fillStyle = '#1e1b18'; // Matches your charcoal interior base panels
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 1.5;
+                    
+                    // Center the circular mechanical node perfectly in the middle of the block panel space
+                    const circleX = (innerX + outerX) / 2 + 2;
+                    const circleY = (topY + bottomY) / 2 + 4;
+                    const circleRadius = 10 * wM; // Scaled proportionally to match your screenshot reference
+                    
+                    ctx.beginPath();
+                    ctx.arc(circleX, circleY, circleRadius, 0, Math.PI * 2);
+                    ctx.fill(); 
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            }
+            // =========================================================================
+            // NEW TYPE 7: SHARP V-CHEVRON SHIELD (FLIPPED ORIENTATION + CHARCOAL INSERT)
+            // =========================================================================
+            else if (type === 7) {
+                // FIXED FOR ORIENTATION: Reversed Y mathematical scales so it points back by default!
+                const y1 = -16 * pM; // Forward attachment point
+                const y2 = 24 * pM;  // Backward tip extension sweep point
+                const y3 = 30 * pM;  // Backward outer tip bezel edge
+                const y4 = 12 * pM;  // Inner slice point returning to fuselage
+                const yTail = -36 * pM; // Trailing spine alignment point
+
+                // 1. Draw the primary wing chevron base plate
+                ctx.beginPath();
+                ctx.moveTo(4, y1);                         
+                ctx.lineTo(52 * wM, y2);                    
+                ctx.lineTo(44 * wM, y3);                    
+                ctx.lineTo(4, y4);                          
+                ctx.lineTo(0, yTail);                          
+                ctx.closePath();
+                ctx.fill(); 
+                ctx.stroke();
+
+                // 2. FIXED: INJECT CO-CENTRIC INNER CHARCOAL MECHANICAL CHASSIS PATH
+                if (!isSilhouette) {
+                    ctx.save();
+                    ctx.fillStyle = '#1e1b18';
+                    ctx.strokeStyle = '#ffffff';
+                    ctx.lineWidth = 1.5;
+
+                    // Trace a slightly smaller, nested internal path loop to mimic a layered frame insert
+                    ctx.beginPath();
+                    ctx.moveTo(12, y1 + 10);
+                    ctx.lineTo(44 * wM, y2 + 2);
+                    ctx.lineTo(40 * wM, y3 - 4);
+                    ctx.lineTo(12, y4 - 4);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            }
+
+            ctx.restore();
+        }
+
+    // --- 1. RENDER WINGS AND EXTERIOR SILHOUETTES GATED ---
+
+    if (showWings) {
+        ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 3;
+        ctx.fillRect(-22 * cache.wingWidthMult, -18, 44 * cache.wingWidthMult, 60 * cache.podLengthMult);
+
+        drawComponentSide(false, cache.wingStyle, cache.invertWings, true);
+        drawComponentSide(true, cache.wingStyle, cache.invertWings, true);
+    }
+
+    let noseY = (cache.noseStyle === 2) ? -66 : -44;
+    
+    // --- 2. HULL BASE STRUCTURE UNDERLAY GATED ---
+    if (showHull) {
+        ctx.save();
+        ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 3;
+        ctx.shadowBlur = 0;
+        ctx.beginPath(); ctx.moveTo(0, noseY); ctx.lineTo(5, noseY + 4); ctx.lineTo(5, 44); ctx.lineTo(-5, 44); ctx.lineTo(-5, noseY + 4); ctx.closePath(); ctx.fill(); ctx.stroke();
+        ctx.restore();
+    }
+
+    ctx.shadowBlur = 0; 
+
+    if (showWings) {
+        ctx.fillStyle = '#1e1b18';
+        ctx.fillRect(-20 * cache.wingWidthMult, -16, 40 * cache.wingWidthMult, 56 * cache.podLengthMult);
+
+        drawComponentSide(false, cache.wingStyle, cache.invertWings, false);
+        drawComponentSide(true, cache.wingStyle, cache.invertWings, false);
+    }
+
+    // --- 3. MAIN INNER FUSELAGE CORE GATED ---
+    if (showHull) {
+        ctx.fillStyle = '#1e1b18'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(0, noseY + 12); ctx.bezierCurveTo(5, noseY + 12, 7, -20, 7, -10); ctx.lineTo(7, 32); ctx.bezierCurveTo(3, 36, -3, 36, -7, 32); ctx.lineTo(-7, -10); ctx.bezierCurveTo(-7, -20, -5, noseY + 12, 0, noseY + 12);
+        ctx.closePath(); ctx.fill(); ctx.stroke();
+    }
+
+    if (showWings) {
+        function drawInteriorMechanics(isLeft, type, invert) {
+            ctx.save(); if (isLeft) ctx.scale(-1, 1); if (invert) ctx.scale(1, -1);
+            ctx.fillStyle = '#1e1b18'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2;
+            const wM = cache.wingWidthMult; const pM = cache.podLengthMult;
+            if (type === 1) ctx.fillRect(12, -14 * pM, 8 * wM, 44 * pM);
+            else if (type === 2 || type === 4 || type === 5) ctx.fillRect(5, 12 * pM, 8 * wM, 20 * pM);
+            else if (type === 3) {
+                ctx.beginPath(); ctx.moveTo(14, 6 * pM); ctx.lineTo(34 * wM, 6 * pM); ctx.lineTo(34 * wM, 20 * pM); ctx.lineTo(14, 26 * pM); ctx.closePath(); ctx.fill(); ctx.stroke();
+            }
+            ctx.restore();
+        }
+        drawInteriorMechanics(false, cache.wingStyle, cache.invertWings);
+        drawInteriorMechanics(true, cache.wingStyle, cache.invertWings);
+    }
+
+    // --- 4. WING DECAL PATTERNS GATED ---
+    if (showWings && showDecals) {
+        function drawPodDecals(isLeft, type, invert, decalMode) {
+            ctx.save(); if (isLeft) ctx.scale(-1, 1); if (invert) ctx.scale(1, -1);
+            ctx.fillStyle = cache.trimColor; ctx.strokeStyle = cache.trimColor; ctx.lineWidth = 2;
+            const wM = cache.wingWidthMult; const pM = cache.podLengthMult;
+
+            if (type === 2) {
+                if (decalMode === 1) {
+                    ctx.beginPath(); ctx.arc(22 * wM, -4 * pM, 15 * pM, Math.PI * 0.9, Math.PI * 1.9, false); ctx.bezierCurveTo(26 * wM, -21 * pM, 13 * wM, -13 * pM, 10 * wM, 4 * pM); ctx.closePath(); ctx.fill();
+                    ctx.beginPath(); ctx.arc(31 * wM, 5 * pM, 3.5, 0, Math.PI * 2); ctx.fill();
+                    ctx.beginPath(); ctx.arc(16 * wM, 22 * pM, 12 * pM, Math.PI * 0.9, Math.PI * 1.9, false); ctx.bezierCurveTo(19 * wM, 9 * pM, 9 * wM, 15 * pM, 7 * wM, 28 * pM); ctx.closePath(); ctx.fill();
+                } else if (decalMode === 2) {
+                    ctx.beginPath(); ctx.moveTo(22 * wM, -12 * pM); ctx.lineTo(30 * wM, 0); ctx.lineTo(22 * wM, 12 * pM); ctx.lineTo(14 * wM, 0); ctx.closePath(); ctx.fill();
+                    ctx.beginPath(); ctx.moveTo(16 * wM, 16 * pM); ctx.lineTo(22 * wM, 26 * pM); ctx.lineTo(16 * wM, 36 * pM); ctx.lineTo(10 * wM, 26 * pM); ctx.closePath(); ctx.fill();
+                } else {
+                    ctx.fillRect(10 * wM, -8 * pM, 14 * wM, 3); ctx.fillRect(10 * wM, 0, 14 * wM, 3);
+                    ctx.fillRect(6 * wM, 16 * pM, 12 * wM, 3); ctx.fillRect(6 * wM, 24 * pM, 12 * wM, 3);
+                }
+            } else if (type === 4) {
+                if (decalMode === 1) {
+                    ctx.beginPath(); ctx.arc(20 * wM, -14 * pM, 5 * pM, 0, Math.PI * 2); ctx.fill();
+                    ctx.beginPath(); ctx.arc(22 * wM, 6 * pM, 7 * pM, 0, Math.PI * 2); ctx.fill();
+                    ctx.beginPath(); ctx.arc(20 * wM, 24 * pM, 5 * pM, 0, Math.PI * 2); ctx.fill();
+                } else if (decalMode === 2) {
+                    ctx.beginPath(); ctx.moveTo(20 * wM, -20 * pM); ctx.lineTo(24 * wM, -14 * pM); ctx.lineTo(20 * wM, -8 * pM); ctx.closePath(); ctx.fill();
+                    ctx.beginPath(); ctx.moveTo(22 * wM, -2 * pM); ctx.lineTo(28 * wM, 6 * pM); ctx.lineTo(22 * wM, 14 * pM); ctx.closePath(); ctx.fill();
+                    ctx.beginPath(); ctx.moveTo(20 * wM, 18 * pM); ctx.lineTo(24 * wM, 24 * pM); ctx.lineTo(20 * wM, 30 * pM); ctx.closePath(); ctx.fill();
+                } else {
+                    ctx.fillRect(12 * wM, -16 * pM, 10 * wM, 2); ctx.fillRect(10 * wM, 4 * pM, 14 * wM, 2); ctx.fillRect(10 * wM, 8 * pM, 14 * wM, 2); ctx.fillRect(12 * wM, 22 * pM, 10 * wM, 2);
+                }
+            } else if (type === 5) {
+                // =========================================================================
+                // BACKPORTED FEATURE: TOP-LAYER BLACK SPHERE-ROD ENGINE INJECTOR
+                // =========================================================================
+                // Stamps your crisp, solid mechanical weapon rods right over the wing colors!
+                ctx.save();
+                
+                // If the generator is drawing the white backdrop silhouette, paint it white, 
+                // otherwise paint it your permanent signature rich charcoal black.
+                ctx.fillStyle = (typeof isSilhouette !== 'undefined' && isSilhouette) ? '#ffffff' : '#1e1b18';
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 1.5;
+
+                const rodX = 16 * wM; 
+                const rodWidth = 4 * wM; 
+                const startY = 30 * pM;  
+                const endY = -10 * pM;   
+                const headRadius = 8 * wM; 
+
+                // 1. Draw the vertical structural black link shaft rod
+                ctx.beginPath();
+                ctx.fillRect(rodX - (rodWidth / 2), endY, rodWidth, startY - endY);
+                ctx.strokeRect(rodX - (rodWidth / 2), endY, rodWidth, startY - endY);
+
+                // 2. Draw the heavy black forward tracking head sphere
+                ctx.beginPath();
+                ctx.arc(rodX, endY, headRadius, 0, Math.PI * 2);
+                ctx.fill(); 
+                ctx.stroke();
+                
+                ctx.restore();
+            }
+            ctx.restore();
+        }
+        drawPodDecals(false, cache.wingStyle, cache.invertWings, cache.decalStyle);
+        drawPodDecals(true, cache.wingStyle, cache.invertWings, cache.decalStyle);
+    }
+
+    // --- 5. ENGINE THRUSTER CHANNELS GATED ---
+    if (showThrusters) {
+        ctx.fillStyle = '#1e1b18';
+        const eS = cache.engineScale;
+        if (cache.engineLayout === 1) {
+            ctx.beginPath(); ctx.moveTo(-5 * eS, 32); ctx.lineTo(5 * eS, 32); ctx.lineTo(8 * eS, 42); ctx.lineTo(-8 * eS, 42); ctx.closePath(); ctx.fill(); ctx.stroke();
+        } else if (cache.engineLayout === 2) {
+            ctx.beginPath(); ctx.moveTo(6 * eS, 32); ctx.lineTo(14 * eS, 32); ctx.lineTo(16 * eS, 42); ctx.lineTo(4 * eS, 42); ctx.closePath(); ctx.fill(); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(-6 * eS, 32); ctx.lineTo(-14 * eS, 32); ctx.lineTo(-16 * eS, 42); ctx.lineTo(-4 * eS, 42); ctx.closePath(); ctx.fill(); ctx.stroke();
+        } else if (cache.engineLayout === 3) {
+            for (let i = 0; i < 8; i++) {
+                ctx.fillRect((-22 + (i * 6)) * eS, 34, 4 * eS, 8);
+                ctx.strokeRect((-22 + (i * 6)) * eS, 34, 4 * eS, 8);
+            }
+        } else {
+            for (let i = 0; i < 8; i++) {
+                ctx.fillRect((-22 + (i * 6)) * eS, 34, 4 * eS, 6); ctx.fillRect((-22 + (i * 6)) * eS, 40, 4 * eS, 6);
+                ctx.strokeRect((-22 + (i * 6)) * eS, 34, 4 * eS, 6); ctx.strokeRect((-22 + (i * 6)) * eS, 40, 4 * eS, 6);
+            }
+        }
+    }
+
+
+
+
+    // --- 7. FLAGGED CANOPY VISOR DETAILS GATED ---
+    // FIXED: Pointed strictly to the showCanopy checkbox so it remains visible when hiding decals!
+    if (showCanopy) {
+        ctx.fillStyle = '#ffffff'; 
+        ctx.strokeStyle = '#ffffff';
+        
+        ctx.beginPath(); 
+        ctx.arc(0, -14, 4, Math.PI, 0, false); 
+        ctx.lineTo(4, -2); 
+        ctx.lineTo(-4, -2); 
+        ctx.closePath(); 
+        ctx.fill();
+        
+        ctx.lineWidth = 2; 
+        ctx.beginPath(); 
+        ctx.moveTo(-4, 4); ctx.lineTo(4, 4); 
+        ctx.moveTo(-4, 10); ctx.lineTo(4, 10); 
+        ctx.stroke();
+        
+        // Only layer the decorative custom trim color box base if showDecals is enabled
+        if (showDecals) {
+            ctx.strokeStyle = cache.trimColor;
+        } else {
+            ctx.strokeStyle = '#ffffff'; // Fallback cleanly to standard white outline if decals are hidden
+        }
+        ctx.strokeRect(-3, 16, 6, 8);
+    }
+
+            // --- 6. GUN POD HARDPOINTS GATED (UPGRADED BATCH SHEETS EDITION) ---
+            if (showPods && cache.hasGunPods) {
+                ctx.save();
+                ctx.fillStyle = cache.trimColor;
+                ctx.strokeStyle = '#ffffff';
+                
+                const barrelW = (cache.podWidthRandom !== undefined) ? cache.podWidthRandom : 2;
+                const barrelH = 55 * ((cache.podLengthRandom !== undefined) ? cache.podLengthRandom : 0.75);
+                const style = cache.podStyle || 1;
+                
+                ctx.lineWidth = 1;
+
+                // FIXED FOR SYMMETRY & REMOVED BLACK: Roll once per ship so left/right are identical, 
+                // and alternate exclusively between high-contrast white or the accent trim color.
+                const strokeRoll = (style % 2 === 0) ? '#ffffff' : cache.trimColor;
+
+                function drawLeftAndRightGuns(xCoord) {
+                    ctx.save();
+                    ctx.translate(xCoord, -20); 
+                    
+                    if (style === 3) {
+                        // STYLE 3: SLEEK LONG TRIANGULAR TURRETS
+                        ctx.beginPath();
+                        ctx.moveTo(-barrelW * 0.8, barrelH * 0.4);   
+                        ctx.lineTo(barrelW * 0.8, barrelH * 0.4);    
+                        ctx.lineTo(0, -barrelH);                    
+                        ctx.closePath();
+                        ctx.fill();
+                        
+                        // Applies the identical, visible stroke color to both wings
+                        ctx.strokeStyle = strokeRoll;
+                        ctx.stroke();
+                    } else {
+                        // STYLE 1 & 2: SLEEK LONG LINE TURRETS
+                        ctx.fillRect(-barrelW / 2, -barrelH * 0.3, barrelW, barrelH * 1.3);
+                        ctx.strokeRect(-barrelW / 2, -barrelH * 0.3, barrelW, barrelH * 1.3);
+                        
+                        if (style === 2) {
+                            ctx.fillStyle = cache.trimColor;
+                            ctx.strokeStyle = '#ffffff';
+                            ctx.beginPath();
+                            ctx.arc(0, barrelH, barrelW * 1.4 + 1.5, 0, Math.PI * 2);
+                            ctx.fill(); ctx.stroke();
+                        }
+                    }
+                    ctx.restore();
+                }
+
+                drawLeftAndRightGuns(10);  // Left Wing Hardpoint
+                drawLeftAndRightGuns(-12); // Right Wing Hardpoint
+                
+                ctx.restore();
+            }
+        } // This curly brace closes your master executeProceduralChassisPaths function!
+
+
+
+
+
+
+
+            // =========================================================================
+        // SECTION 2: UPDATED DATA ROLLER (EXPANDED TO 7 WING OPTIONS)
+        // =========================================================================
+        function rollProceduralCache(forceSingleColor, lockedHull, lockedTrim) {
+            const allowInverted = document.getElementById('allow-inverted').checked;
+            const forceInverted = document.getElementById('force-inverted').checked;
+            
+            const allowSlickback = document.getElementById('allow-slickback').checked;
+            const allowQuadPods = document.getElementById('allow-quad-pods').checked;
+            const allowStinger = document.getElementById('allow-stinger').checked;
+            const allowTriplePods = document.getElementById('allow-triple-pods').checked;
+            const allowSnub = document.getElementById('allow-snub').checked;
+            // NEW MUTATION GATE CHECKS: Use Type 5 as a safe fallback if these elements don't exist in UI yet
+            const allowRect = document.getElementById('allow-rectangular') ? document.getElementById('allow-rectangular').checked : true;
+            const allowV = document.getElementById('allow-v-sharp') ? document.getElementById('allow-v-sharp').checked : true;
+
+            const traitRoll = Math.random();
+            let chosenTrait = 'STANDARD';
+            if (traitRoll < 0.22) chosenTrait = 'HOMING';
+            else if (traitRoll < 0.44) chosenTrait = 'SPREAD';
+            else if (traitRoll < 0.66) chosenTrait = 'DOUBLE';
+
+            let wingStyle, invertWings;
+            let isValidSelection = false;
+            let panicCounter = 0;
+
+            while (!isValidSelection && panicCounter < 400) {
+                // FIXED FOR SEVEN OPTIONS: Bumped style picker from 5 up to 7!
+                wingStyle = Math.floor(Math.random() * 7) + 1; 
+                invertWings = Math.random() > 0.5;
+                panicCounter++;
+
+                if (forceInverted) {
+                    invertWings = true; 
+                } else if (!allowInverted) {
+                    invertWings = false; 
+                }
+
+                isValidSelection = true; 
+
+                // Evaluate individual architectural exclusion checkbox gates
+                if (!allowSlickback && wingStyle === 1) isValidSelection = false;
+                if (!allowQuadPods && wingStyle === 2) isValidSelection = false;
+                if (!allowStinger && wingStyle === 3) isValidSelection = false;
+                if (!allowTriplePods && wingStyle === 4) isValidSelection = false;
+                if (!allowSnub && wingStyle === 5) isValidSelection = false;
+                if (!allowRect && wingStyle === 6) isValidSelection = false;
+                if (!allowV && wingStyle === 7) isValidSelection = false;
+
+                // EMERGENCY PROTECTION FALLBACK
+                if (!allowSlickback && !allowQuadPods && !allowStinger && !allowTriplePods && !allowSnub && !allowRect && !allowV) {
+                    wingStyle = 5;
+                    isValidSelection = true;
+                }
+            }
+
+            const finalHullColor = forceSingleColor ? lockedHull : PALLETS[Math.floor(Math.random() * PALLETS.length)];
+            const finalTrimColor = forceSingleColor ? lockedTrim : ACCENTS[Math.floor(Math.random() * ACCENTS.length)];
+
+            return {
+                wingStyle: wingStyle,      
+                decalStyle: Math.floor(Math.random() * 3) + 1,     
+                noseStyle: Math.floor(Math.random() * 2) + 1,      
+                engineLayout: Math.floor(Math.random() * 4) + 1,   
+                hasGunPods: Math.random() > 0.4,                   
+                invertWings: invertWings,
+                sizeMult: 0.95, 
+                wingWidthMult: 0.85 + Math.random() * 0.35,  
+                podLengthMult: 0.85 + Math.random() * 0.3,   
+                engineScale: 0.9 + Math.random() * 0.25,     
+                hullColor: finalHullColor,
+                trimColor: finalTrimColor,
+                weaponTrait: chosenTrait,
+                podLengthRandom: 0.35 + Math.random() * 0.45,
+                podWidthRandom: 1.0 + Math.random() * 2.0,
+                podStyle: Math.floor(Math.random() * 3) + 1
+            };
+        }
+
+
+
+        // SECTION 3: Canvas Card Display Wrapper
+        function drawProceduralShip(ctx, cache) {
+            ctx.save();
+            ctx.translate(60, 60); 
+
+            // 1. DYNAMIC ROTATION PIPELINE: Maps custom input degrees cleanly (0° = nose straight up)
+            const uiDegrees = parseFloat(document.getElementById('input-rotation').value) || 0;
+            const finalRotationAngle = (uiDegrees * Math.PI) / 180;
+            ctx.rotate(finalRotationAngle); 
+
+            // 2. DYNAMIC SCALING PIPELINE: Calibrates base transform matrix by custom percentage factor
+            const uiScalePercent = parseFloat(document.getElementById('input-scale').value) || 100;
+            const finalScaleFactor = 0.72 * (uiScalePercent / 100) * cache.sizeMult;
+            ctx.scale(finalScaleFactor, finalScaleFactor);
+            
+            ctx.shadowBlur = 12;         
+            ctx.shadowColor = 'rgba(255, 255, 255, 0.62)'; 
+            ctx.lineJoin = 'miter'; ctx.miterLimit = 10; ctx.lineCap = 'square';
+
+            executeProceduralChassisPaths(ctx, cache);
+            ctx.restore();
+        }
+
+        // =========================================================================
+        // SECTION 4: FIXED REFORGE MATRIX LOOP WITH TRUE GLOBAL COLOR LOCKS
+        // =========================================================================
+        function generateFleetSheet() {
+            const container = document.getElementById('fleet-container');
+            const totalCount = parseInt(document.getElementById('input-count').value) || 64;
+            const columns = parseInt(document.getElementById('input-columns').value) || 8;
+            const spacing = parseInt(document.getElementById('input-spacing').value) || 6;
+            
+            // Read active checkbox visibility and behavior rule parameters
+            const displayLabels = document.getElementById('toggle-label').checked;
+            
+            // FIXED STATE READ: Cleanly captures if the color lock toggle is checked or unchecked
+            const useSingleColor = document.getElementById('toggle-single-color').checked;
+
+            container.style.gridTemplateColumns = `repeat(${columns}, 120px)`;
+            container.style.gap = `${spacing}px`;
+            container.innerHTML = ''; 
+
+            // Roll a single, master locked theme palette up-front 
+            const masterThemeHull = PALLETS[Math.floor(Math.random() * PALLETS.length)];
+            const masterThemeTrim = ACCENTS[Math.floor(Math.random() * ACCENTS.length)];
+
+            const badgeColors = { 'STANDARD': '#aaaaaa', 'HOMING': '#ff2222', 'SPREAD': '#77cc99', 'DOUBLE': '#00ffff' };
+
+            for (let i = 0; i < totalCount; i++) {
+                const card = document.createElement('div');
+                card.className = 'ship-card';
+
+                const canvas = document.createElement('canvas');
+                canvas.width = 120; canvas.height = 120;
+                
+                // FIXED COMPILER BOUNDS: Forces the engine to pass the single color variables down cleanly
+                const shipCache = rollProceduralCache(useSingleColor, masterThemeHull, masterThemeTrim);
+                
+                drawProceduralShip(canvas.getContext('2d'), shipCache);
+                card.appendChild(canvas);
+
+                if (displayLabels) {
+                    const badge = document.createElement('div');
+                    badge.className = 'trait-badge';
+                    badge.style.color = badgeColors[shipCache.weaponTrait];
+                    badge.innerText = shipCache.weaponTrait;
+                    card.appendChild(badge);
+                }
+
+                container.appendChild(card);
+            }
+        }
+
+               // =========================================================================
+        // FIXED FOR ILLUSTRATOR: HIGH-RES PNG EXPORTER (BLOB CONVERSION PIPELINE)
+        // =========================================================================
+        function exportFleetAsPNG() {
+            const cards = document.querySelectorAll('.ship-card');
+            if (cards.length === 0) return;
+
+            const columns = parseInt(document.getElementById('input-columns').value) || 8;
+            const spacing = parseInt(document.getElementById('input-spacing').value) || 6;
+            const totalRows = Math.ceil(cards.length / columns);
+            const displayLabels = document.getElementById('toggle-label').checked;
+
+            const exportCanvas = document.createElement('canvas');
+            exportCanvas.width = columns * 120 + (columns - 1) * spacing;
+            exportCanvas.height = totalRows * 120 + (totalRows - 1) * spacing;
+            const eCtx = exportCanvas.getContext('2d');
+
+            // Force solid dark background fills
+            eCtx.fillStyle = '#0b0c10'; 
+            eCtx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+
+            cards.forEach((card, index) => {
+                const srcCanvas = card.querySelector('canvas');
+                const badge = card.querySelector('.trait-badge');
+                if (!srcCanvas) return;
+
+                const col = index % columns;
+                const row = Math.floor(index / columns);
+                const x = col * (120 + spacing);
+                const y = row * (120 + spacing);
+
+                eCtx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+                eCtx.strokeStyle = '#222';
+                eCtx.lineWidth = 1;
+                eCtx.fillRect(x, y, 120, 120);
+                eCtx.strokeRect(x, y, 120, 120);
+
+                eCtx.drawImage(srcCanvas, x, y);
+
+                if (displayLabels && badge) {
+                    eCtx.fillStyle = 'rgba(0, 0, 0, 0.65)';
+                    eCtx.fillRect(x, y + 120 - 14, 120, 14);
+                    eCtx.fillStyle = window.getComputedStyle(badge).color || '#fff';
+                    eCtx.font = '900 8px monospace';
+                    eCtx.textAlign = 'center';
+                    eCtx.textBaseline = 'middle';
+                    eCtx.fillText(badge.innerText, x + 60, y + 120 - 7);
+                }
+            });
+
+            // FIXED: Converts raw canvas frames into a pure binary layout 
+            // to bypass Illustrator STEX texture registry crashes!
+            exportCanvas.toBlob((blob) => {
+                const downloadLink = document.createElement('a');
+                downloadLink.download = 'procedural_fleet_sheet.png';
+                downloadLink.href = URL.createObjectURL(blob);
+                downloadLink.click();
+                
+                // Cleanup runtime object layout tracking memories safely
+                setTimeout(() => URL.revokeObjectURL(downloadLink.href), 100);
+            }, 'image/png');
+        }
+
+        // =========================================================================
+        // PURE VECTOR PATH SVG COMPILER (100% CLEAN FOR ADOBE ILLUSTRATOR)
+        // =========================================================================
+        function exportFleetAsSVG() {
+            const cards = document.querySelectorAll('.ship-card');
+            if (cards.length === 0) return;
+
+            const columns = parseInt(document.getElementById('input-columns').value) || 8;
+            const spacing = parseInt(document.getElementById('input-spacing').value) || 6;
+            const totalRows = Math.ceil(cards.length / columns);
+
+            const gridWidth = columns * 120 + (columns - 1) * spacing;
+            const gridHeight = totalRows * 120 + (totalRows - 1) * spacing;
+
+            // Fetch current layer filters checkbox toggles from your interface
+            const showWings = document.getElementById('toggle-wings').checked;
+            const showPods = document.getElementById('toggle-pods').checked;
+            const showHull = document.getElementById('toggle-hull').checked;
+            const showDecals = document.getElementById('toggle-decals').checked;
+            const showThrusters = document.getElementById('toggle-thrusters').checked;
+            const displayLabels = document.getElementById('toggle-label').checked;
+
+            const uiDegrees = parseFloat(document.getElementById('input-rotation').value) || 0;
+            const finalRotationAngle = (uiDegrees * Math.PI) / 180;
+
+            const uiScalePercent = parseFloat(document.getElementById('input-scale').value) || 100;
+            const globalScaleFactor = 0.72 * (uiScalePercent / 100);
+
+            // Create valid XML document headers formatted for pure mathematical vector layouts
+            let svg = `<?xml version="1.0" encoding="utf-8"?>\n`;
+            svg += `<svg version="1.1" xmlns="http://w3.org" xmlns:xlink="http://w3.org" width="${gridWidth}" height="${gridHeight}" viewBox="0 0 ${gridWidth} ${gridHeight}">\n`;
+            
+            // Add a dark baseline background workspace rectangle layout sheet
+            svg += `  <rect width="100%" height="100%" fill="#0b0c10" />\n`;
+
+            const badgeColors = { 'STANDARD': '#aaaaaa', 'HOMING': '#ff2222', 'SPREAD': '#77cc99', 'DOUBLE': '#00ffff' };
+
+            // LOOP STRUCTURE: Recreates vector coordinates entirely from structural data parameters
+            cards.forEach((card, index) => {
+                const col = index % columns;
+                const row = Math.floor(index / columns);
+                const cellX = col * (120 + spacing);
+                const cellY = row * (120 + spacing);
+
+                // FIXED: Re-roll individual properties using your seed function to generate pure paths math
+                const cache = rollProceduralCache(); 
+                const radius = 18 * cache.sizeMult;
+                const wM = cache.wingWidthMult;
+                const pM = cache.podLengthMult;
+                const eS = cache.engineScale;
+                const noseY = (cache.noseStyle === 2) ? -66 : -44;
+
+                // Open grid location grouping tags
+                svg += `  <g transform="translate(${cellX}, ${cellY})">\n`;
+                svg += `    <rect width="120" height="120" fill="rgba(0,0,0,0.4)" stroke="#222" stroke-width="1" />\n`;
+
+                const finalScale = globalScaleFactor * cache.sizeMult;
+                const totalRotationInRadians = finalRotationAngle - (Math.PI / 2);
+                
+                // Nested transformation alignment node for scaling and rotation
+                svg += `    <g transform="translate(60, 60) rotate(${totalRotationInRadians * 180 / Math.PI}) scale(${finalScale})">\n`;
+
+                // Vector string compiler path subroutine
+                function buildWingPath(isLeft) {
+                    const scaleX = isLeft ? -1 : 1;
+                    const scaleY = cache.invertWings ? -1 : 1;
+                    let d = '';
+
+                    if (cache.wingStyle === 1) { // SLICKBACK
+                        if (cache.invertWings) {
+                            d = `M ${10 * scaleX} ${-20 * pM * scaleY} C ${34 * wM * scaleX} ${10 * pM * scaleY} ${54 * wM * scaleX} ${26 * pM * scaleY} ${54 * wM * scaleX} ${34 * pM * scaleY} C ${54 * wM * scaleX} ${40 * pM * scaleY} ${42 * wM * scaleX} ${40 * pM * scaleY} ${24 * wM * scaleX} ${38 * pM * scaleY} L ${10 * scaleX} ${42 * pM * scaleY} L 0 ${44 * pM * scaleY} Z`;
+                        } else {
+                            d = `M ${10 * scaleX} ${-20 * pM * scaleY} L ${54 * wM * scaleX} ${40 * pM * scaleY} L ${24 * wM * scaleX} ${38 * pM * scaleY} L ${10 * scaleX} ${42 * pM * scaleY} L 0 ${44 * pM * scaleY} Z`;
+                        }
+                    } else if (cache.wingStyle === 2) { // HEAVY FLAPS
+                        d = `M ${0} ${44 * pM * scaleY} L ${22 * wM * scaleX} ${17 * pM * scaleY} A ${21 * pM} ${21 * pM} 0 0 0 ${22 * wM * scaleX} ${-25 * pM * scaleY} L ${16 * wM * scaleX} ${5 * pM * scaleY} A ${17 * pM} ${17 * pM} 0 0 0 ${16 * wM * scaleX} ${39 * pM * scaleY} Z`;
+                    } else if (cache.wingStyle === 3) { // STINGER
+                        d = `M ${10 * scaleX} ${-20 * pM * scaleY} L ${38 * wM * scaleX} ${4 * pM * scaleY} L ${38 * wM * scaleX} ${-32 * pM * scaleY} L ${44 * wM * scaleX} ${26 * pM * scaleY} L ${32 * wM * scaleX} ${22 * pM * scaleY} L 0 ${44 * pM * scaleY} Z`;
+                    } else if (cache.wingStyle === 4) { // TRIPLE PODS
+                        d = `M ${0} ${44 * pM * scaleY} L ${20 * wM * scaleX} ${-1 * pM * scaleY} A ${13 * pM} ${13 * pM} 0 0 0 ${20 * wM * scaleX} ${-27 * pM * scaleY} L ${22 * wM * scaleX} ${-10 * pM * scaleY} A ${16 * pM} ${16 * pM} 0 0 0 ${22 * wM * scaleX} ${22 * pM * scaleY} L ${20 * wM * scaleX} ${11 * pM * scaleY} A ${13 * pM} ${13 * pM} 0 0 0 ${20 * wM * scaleX} ${37 * pM * scaleY} Z`;
+                    } else { // MINIMAL
+                        d = `M ${10 * scaleX} ${-18 * pM * scaleY} L ${22 * wM * scaleX} ${-18 * pM * scaleY} L ${24 * wM * scaleX} ${-14 * pM * scaleY} L ${24 * wM * scaleX} ${34 * pM * scaleY} C ${24 * wM * scaleX} ${42 * pM * scaleY} ${14 * wM * scaleX} ${42 * pM * scaleY} ${12 * wM * scaleX} ${40 * pM * scaleY} L 0 ${44 * pM * scaleY} Z`;
+                    }
+                    return `<path d="${d}" fill="${cache.hullColor}" stroke="#ffffff" stroke-width="1.5" />`;
+                }
+
+                // 1. Draw Outer Wing Backdrops & Frame Silhouettes
+                if (showWings) {
+                    svg += `      <rect x="${-22 * wM}" y="-18" width="${44 * wM}" height="${60 * pM}" fill="#ffffff" stroke="#ffffff" stroke-width="3" />\n`;
+                    svg += `      ${buildWingPath(false).replace(/fill=".*?"/, 'fill="#ffffff" stroke="#ffffff" stroke-width="3"')}\n`;
+                    svg += `      ${buildWingPath(true).replace(/fill=".*?"/, 'fill="#ffffff" stroke="#ffffff" stroke-width="3"')}\n`;
+                }
+
+                // 2. Draw Nose Frame Silhouettes Underlays
+                if (showHull) {
+                    svg += `      <path d="M 0 ${noseY} L 5 ${noseY + 4} L 5 44 L -5 44 L -5 ${noseY + 4} Z" fill="#ffffff" stroke="#ffffff" stroke-width="3" />\n`;
+                }
+
+                // 3. Draw Interior Main Wing Plates Covers
+                if (showWings) {
+                    svg += `      <rect x="${-20 * wM}" y="-16" width="${40 * wM}" height="${56 * pM}" fill="#1e1b18" />\n`;
+                    svg += `      ${buildWingPath(false)}\n`;
+                    svg += `      ${buildWingPath(true)}\n`;
+                }
+
+                // 4. Draw Inner Core Fuselage Panels
+                if (showHull) {
+                    svg += `      <path d="M 0 ${noseY + 12} C 5 ${noseY + 12} 7 -20 7 -10 L 7 32 C 3 36 -3 36 -7 32 L -7 -10 C -7 -20 -5 ${noseY + 12} 0 ${noseY + 12} Z" fill="#1e1b18" stroke="#ffffff" stroke-width="2" />\n`;
+                }
+
+                // 5. Draw Decorative Accent Decals
+                if (showWings && showDecals) {
+                    const scaleY = cache.invertWings ? -1 : 1;
+                    if (cache.wingStyle === 2) {
+                        svg += `      <circle cx="${22 * wM}" cy="${-4 * pM * scaleY}" r="${6}" fill="${cache.trimColor}" />\n`;
+                        svg += `      <circle cx="${-22 * wM}" cy="${-4 * pM * scaleY}" r="${6}" fill="${cache.trimColor}" />\n`;
+                    } else if (cache.wingStyle === 5) {
+                        svg += `      <rect x="${13 * wM}" y="${-4 * pM * scaleY}" width="6" height="3" fill="${cache.trimColor}" />\n`;
+                        svg += `      <rect x="${-13 * wM - 6}" y="${-4 * pM * scaleY}" width="6" height="3" fill="${cache.trimColor}" />\n`;
+                    }
+                }
+
+                // 6. Draw Engine Jet Configurations
+                if (showThrusters) {
+                    if (cache.engineLayout === 1) {
+                        svg += `      <path d="M ${-5 * eS} 32 L ${5 * eS} 32 L ${8 * eS} 42 L ${-8 * eS} 42 Z" fill="#1e1b18" stroke="#ffffff" stroke-width="1.5" />\n`;
+                        svg += `      <rect x="${-4 * eS}" y="42" width="${8 * eS}" height="6" fill="#ff5500" />\n`;
+                    } else {
+                        svg += `      <rect x="${-12 * eS}" y="32" width="${6 * eS}" height="8" fill="#ff5500" stroke="#ffffff" stroke-width="1" />\n`;
+                        svg += `      <rect x="${6 * eS}" y="32" width="${6 * eS}" height="8" fill="#ff5500" stroke="#ffffff" stroke-width="1" />\n`;
+                    }
+                }
+
+                // 7. Draw Wing Gun Pod Barrels
+                if (showPods && cache.hasGunPods) {
+                    svg += `      <rect x="10" y="-20" width="2" height="24" fill="#ffffff" />\n`;
+                    svg += `      <rect x="-12" y="-20" width="2" height="24" fill="#ffffff" />\n`;
+                }
+
+                // 8. Draw Central Cockpit Glass Frames
+                if (showDecals) {
+                    svg += `      <path d="M -4 -2 A 4 4 0 0 1 4 -2 Z" fill="#ffffff" stroke="#ffffff" stroke-width="1" />\n`;
+                    svg += `      <line x1="-4" y1="4" x2="4" y2="4" stroke="#ffffff" stroke-width="2" />\n`;
+                    svg += `      <rect x="-3" y="16" width="6" height="8" fill="none" stroke="${cache.trimColor}" stroke-width="2" />\n`;
+                }
+
+                svg += `    </g>\n`; // Closes nested local canvas transformation node cleanly
+
+                // 9. Overlay Text Ribbon Struts
+                if (displayLabels) {
+                    svg += `    <rect y="106" width="120" height="14" fill="rgba(0,0,0,0.75)" />\n`;
+                    svg += `    <text x="60" y="115" fill="${badgeColors[cache.weaponTrait]}" font-family="monospace" font-size="8px" font-weight="900" text-anchor="middle" letter-spacing="0.5px">${cache.weaponTrait}</text>\n`;
+                }
+
+                svg += `  </g>\n`; // Closes cell tracking matrix container tag
+            });
+
+            svg += `</svg>`;
+
+            // Trigger the native vector save file download prompt box natively
+            const svgBlob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
+            const downloadLink = document.createElement('a');
+            downloadLink.download = 'procedural_fleet_sheet.svg';
+            downloadLink.href = URL.createObjectURL(svgBlob);
+            downloadLink.click();
+        }
+
+        window.onload = generateFleetSheet;
+    </script>
+</body>
+</html>
