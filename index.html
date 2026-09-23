@@ -214,9 +214,40 @@
 
 
     <script>
-        const PALLETS = ['#e1c6e5', '#e5e3e7', '#e4e8e3', '#ffd700', '#ff9d42', '#77cc99', '#00e5ff', '#ff3d00'];
-        const ACCENTS = ['#d4b0db', '#ff9d42', '#77cc99', '#fff200', '#ffffff', '#00e5ff'];
+             // Custome Ship Colors
+            const PALLETS = [
+                '#e1c6e5',
+                '#e5e3e7',
+                '#e4e8e3', 
+                '#ffd700',
+                '#ff9d42', 
+                '#77cc99', 
+                '#00b2e3',
+                '#56c1bc',
+                '#f8d0ac',
+                '#6dcff6',
+                '#f49ac1',
+                '#fff799',
+                '#bcbec0',
+                '#ea399a',
 
+                '#ff3d00'
+            ];
+
+            // Custom ship Accent colors
+            const ACCENTS = [
+                '#d4b0db', 
+                '#ff9d42', 
+                '#77cc99', 
+                '#fff200', 
+                '#ffffff',
+                '#f06eaa',
+                '#8197cd',
+                '#8dc63f',
+                
+                '#00e5ff'
+            ];
+            
  function executeProceduralChassisPaths(ctx, cache) {
     if (!ctx || !cache) return;
 
@@ -1021,6 +1052,8 @@
         }
 
         window.onload = generateFleetSheet;
+
+        // copyright smurphshire 2026
     </script>
 </body>
 </html>
