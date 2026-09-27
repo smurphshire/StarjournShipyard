@@ -216,36 +216,41 @@
     <script>
              // Custome Ship Colors
             const PALLETS = [
-                '#e1c6e5',
-                '#e5e3e7',
-                '#e4e8e3', 
-                '#ffd700',
-                '#ff9d42', 
-                '#77cc99', 
-                '#00b2e3',
-                '#56c1bc',
-                '#f8d0ac',
-                '#6dcff6',
-                '#f49ac1',
-                '#fff799',
-                '#bcbec0',
-                '#ea399a',
+              //  '#e1c6e5', // lavender pink
+                '#e5e3e7', // very light gray
+              //  '#e4e8e3', // near white gray
+                '#ffd700', // Bright Yellow
+                '#ff9d42',  //Bright Orange
+                '#77cc99', // Bright Mint Green
+                '#00b2e3', // Bright Blue
+                '#56c1bc', // Tealish
+              //  '#f8d0ac', // Pale Orange
+              //  '#6dcff6', // Baby Blue
+              //  '#f49ac1', //Pink
+               // '#fff799', // light/pale yellow
+                '#bcbec0', // Gray
+                '#ea399a', // Magenta
+                '#ff3d00', // red
+               // '#ffffff' // White
 
-                '#ff3d00'
             ];
 
             // Custom ship Accent colors
             const ACCENTS = [
-                '#d4b0db', 
-                '#ff9d42', 
-                '#77cc99', 
-                '#fff200', 
-                '#ffffff',
-                '#f06eaa',
-                '#8197cd',
-                '#8dc63f',
-                
-                '#00e5ff'
+                  '#e1c6e5', // lavender pink
+                '#d4b0db', // lilac purple
+                '#ff9d42', // Orange
+                '#77cc99',  // Mint Green
+                '#f8d0ac', // Pale Orange
+               '#fff200', // Bright Yellow
+              //  '#f06eaa', // Pink magenta
+                '#8197cd', // cold steel blue
+               '#8dc63f', // Green
+               '#fff799', // light/pale yellow
+                 '#6dcff6', // Baby Blue  
+              //  '#00e5ff,' // Neon Blue
+                '#ffffff' // White
+
             ];
             
  function executeProceduralChassisPaths(ctx, cache) {
@@ -325,17 +330,34 @@
                 ctx.arc(22 * wM, 6 * pM, 16 * pM, 0, Math.PI * 2);  
                 ctx.fill(); ctx.stroke();
             } else if (type === 5) {
-                // Type 5: Snub Wing Minimalist Variant Panel Base
+                // Type 5: Snub Wing (Wider, Lower Flare Stance with Reversed Inversion Shift)
+                const isWingInverted = cache.invertWings || false;
+                // FIXED DIRECTION: Changed to a negative value to shift it down correctly on the inverted coordinate matrix
+                let yShift = isWingInverted ? -16 * pM : 0;
+
                 ctx.beginPath();
-                ctx.moveTo(10, -18 * pM);
-                ctx.lineTo(22 * wM, -18 * pM);
-                ctx.lineTo(24 * wM, -14 * pM); 
-                ctx.lineTo(24 * wM, 34 * pM);
-                ctx.bezierCurveTo(24 * wM, 42 * pM, 14 * wM, 42 * pM, 12 * wM, 40 * pM);
-                ctx.lineTo(0, 44 * pM);
+                ctx.moveTo(10, (-18 * pM) + yShift);
+                ctx.lineTo(16 * wM, (-18 * pM) + yShift);
+                // Widen out to 32 and pulled lower down to Y=0 to match the blue screenshot profile
+                ctx.lineTo(32 * wM, (0 * pM) + yShift); 
+                ctx.lineTo(24 * wM, (34 * pM) + yShift);
+                ctx.bezierCurveTo(24 * wM, (42 * pM) + yShift, 14 * wM, (42 * pM) + yShift, 12 * wM, (40 * pM) + yShift);
+                ctx.lineTo(0, (44 * pM) + yShift);
                 ctx.closePath();
                 ctx.fill(); ctx.stroke();
+
+                // Embedded Black Triangular Inset Marking Panel (Tracks Shift Symmetrically)
+                ctx.fillStyle = '#1e1b18';
+                ctx.beginPath();
+                ctx.moveTo(14 * wM, (-8 * pM) + yShift);
+                ctx.lineTo(26 * wM, (1 * pM) + yShift); // Follows the wider, lower outer contour angle
+                ctx.lineTo(14 * wM, (18 * pM) + yShift);
+                ctx.closePath();
+                ctx.fill(); ctx.stroke();
+                
+                ctx.fillStyle = '#1e1b18'; // Reset core color mapping bounds
             }
+
 
                         // =========================================================================
             // NEW TYPE 6: RECTANGULAR CARGO HOUSING (WITH SOLID BLACK ACCENT DISC DETAIL)
@@ -446,7 +468,7 @@
         ctx.save();
         ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 3;
         ctx.shadowBlur = 0;
-        ctx.beginPath(); ctx.moveTo(0, noseY); ctx.lineTo(5, noseY + 4); ctx.lineTo(5, 44); ctx.lineTo(-5, 44); ctx.lineTo(-5, noseY + 4); ctx.closePath(); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, noseY); ctx.lineTo(5, noseY + 4); ctx.lineTo(5, 22); ctx.lineTo(-5, 22); ctx.lineTo(-5, noseY + 4); ctx.closePath(); ctx.fill(); ctx.stroke();
         ctx.restore();
     }
 
@@ -460,12 +482,89 @@
         drawComponentSide(true, cache.wingStyle, cache.invertWings, false);
     }
 
-    // --- 3. MAIN INNER FUSELAGE CORE GATED ---
+// --- 3. MAIN INNER FUSELAGE CORE GATED ---
     if (showHull) {
         ctx.fillStyle = '#1e1b18'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(0, noseY + 12); ctx.bezierCurveTo(5, noseY + 12, 7, -20, 7, -10); ctx.lineTo(7, 32); ctx.bezierCurveTo(3, 36, -3, 36, -7, 32); ctx.lineTo(-7, -10); ctx.bezierCurveTo(-7, -20, -5, noseY + 12, 0, noseY + 12);
-        ctx.closePath(); ctx.fill(); ctx.stroke();
+        
+        // Define a numeric style variable (1 = Sleek/Default, 2 = Cobra/V-Shape, 3 = Teardrop)
+        if (typeof cache.hullStyle === 'undefined') {
+            cache.hullStyle = Math.floor(Math.random() * 3) + 1;
+        }
+
+        if (cache.hullStyle === 1) {
+            // --- 1. SLEEK (Original) ---
+            ctx.beginPath();
+            ctx.moveTo(0, noseY + 12); ctx.bezierCurveTo(5, noseY + 12, 7, -20, 7, -10); ctx.lineTo(7, 32); ctx.bezierCurveTo(3, 36, -3, 36, -7, 32); ctx.lineTo(-7, -10); ctx.bezierCurveTo(-7, -20, -5, noseY + 12, 0, noseY + 12);
+            ctx.closePath(); ctx.fill(); ctx.stroke();
+
+    
+
+        } else if (cache.hullStyle === 2) {
+            // --- 2. V-SHAPE / COBRA COWL (Aggressive Winged Fork) ---
+            const prongWidth = 18;  // Outer span width of the fork points
+            
+            ctx.beginPath();
+            // Start at the center indentation point of the front V notch
+            ctx.moveTo(0, noseY + 10); 
+            
+            // Sweep up and outward to the sharp Starboard pincer prong tip
+            ctx.lineTo(prongWidth, noseY); 
+            // Flare backward down the side to create the aggressive wing shelf
+            ctx.bezierCurveTo(prongWidth, noseY + 14, prongWidth * 0.7, noseY + 16, 7, -10); 
+            
+            // Core mid-flank line and engine alignment path (Untouched for stability)
+            ctx.lineTo(7, 32);
+            ctx.bezierCurveTo(3, 36, -3, 36, -7, 32);
+            ctx.lineTo(-7, -10);
+            
+            // Port mirror return path (Back up to the left side and prong tip)
+            ctx.bezierCurveTo(-prongWidth * 0.7, noseY + 16, -prongWidth, noseY + 14, -prongWidth, noseY);
+            ctx.closePath(); ctx.fill(); ctx.stroke();
+
+            // Inner Chevron "V" Arrow Decal (Dynamically proportional scale matching the mockup)
+            ctx.fillStyle = cache.trimColor;
+            
+            const availableDistance = Math.abs(noseY - (-14));
+            const dynamicEndPosition = noseY + (availableDistance * 0.75);
+            const decalWidth = prongWidth * 0.45;
+
+            ctx.beginPath();
+            // Outer V contour
+            ctx.moveTo(0, noseY + 16);
+            ctx.lineTo(decalWidth, noseY + 8);
+            ctx.lineTo(decalWidth * 0.5, noseY + 8);
+            ctx.lineTo(0, dynamicEndPosition); // Points perfectly down right above the cockpit
+            ctx.lineTo(-decalWidth * 0.5, noseY + 8);
+            ctx.lineTo(-decalWidth, noseY + 8);
+            ctx.closePath(); ctx.fill();
+
+        } else if (cache.hullStyle === 3) {
+            // --- 3. TEARDROP ---
+            const bulbWidth = 14;   
+            
+            // Accent Color Shadow Rim Offset (+1.5px outward glow look)
+            ctx.strokeStyle = cache.trimColor; ctx.lineWidth = 5; 
+            ctx.beginPath();
+            ctx.moveTo(0, noseY); ctx.bezierCurveTo(bulbWidth, noseY, bulbWidth, -15, bulbWidth, 0); ctx.bezierCurveTo(bulbWidth * 0.5, 20, 7, 28, 7, 32); ctx.bezierCurveTo(3, 36, -3, 36, -7, 32); ctx.bezierCurveTo(-bulbWidth * 0.5, 20, -bulbWidth, -15, -bulbWidth, 0); ctx.bezierCurveTo(-bulbWidth, -15, -bulbWidth, noseY, 0, noseY);
+            ctx.closePath(); ctx.stroke();
+
+            // Main Core Fuselage Overlay
+            ctx.fillStyle = '#1e1b18'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(0, noseY); ctx.bezierCurveTo(bulbWidth, noseY, bulbWidth, -15, bulbWidth, 0); ctx.bezierCurveTo(bulbWidth * 0.5, 20, 7, 28, 7, 32); ctx.bezierCurveTo(3, 36, -3, 36, -7, 32); ctx.bezierCurveTo(-bulbWidth * 0.5, 20, -bulbWidth, -15, -bulbWidth, 0); ctx.bezierCurveTo(-bulbWidth, -15, -bulbWidth, noseY, 0, noseY);
+            ctx.closePath(); ctx.fill(); ctx.stroke();
+
+            // Dynamic Proportional Triangle Pinstripe (Set to your perfected 0.75 ratio)
+            ctx.fillStyle = cache.trimColor;
+            const availableDistance = Math.abs(noseY - (-14));
+            const dynamicEndPosition = noseY + (availableDistance * 0.75);
+
+            ctx.beginPath();
+            ctx.moveTo(0, noseY + 5); 
+            ctx.lineTo(3.5, dynamicEndPosition); 
+            ctx.lineTo(-3.5, dynamicEndPosition);
+            ctx.closePath(); ctx.fill();
+        }
     }
 
     if (showWings) {
@@ -517,7 +616,7 @@
                 }
             } else if (type === 5) {
                 // =========================================================================
-                // BACKPORTED FEATURE: TOP-LAYER BLACK SPHERE-ROD ENGINE INJECTOR
+                // BACKPORTED FEATURE: MID-LAYER BLACK SPHERE-ROD ENGINE INJECTOR
                 // =========================================================================
                 // Stamps your crisp, solid mechanical weapon rods right over the wing colors!
                 ctx.save();
@@ -534,19 +633,24 @@
                 const endY = -10 * pM;   
                 const headRadius = 8 * wM; 
 
+                // --- NEW MIDPOINT CALCULATION ---
+                // Find the exact vertical center between the top and bottom of the rod
+                const midY = (endY + startY) / 2;
+
                 // 1. Draw the vertical structural black link shaft rod
                 ctx.beginPath();
                 ctx.fillRect(rodX - (rodWidth / 2), endY, rodWidth, startY - endY);
                 ctx.strokeRect(rodX - (rodWidth / 2), endY, rodWidth, startY - endY);
 
-                // 2. Draw the heavy black forward tracking head sphere
+                // 2. Draw the heavy black sphere right in the middle of the rod
                 ctx.beginPath();
-                ctx.arc(rodX, endY, headRadius, 0, Math.PI * 2);
+                ctx.arc(rodX, midY, headRadius, 0, Math.PI * 2); // Moved from endY to midY
                 ctx.fill(); 
                 ctx.stroke();
                 
                 ctx.restore();
             }
+
             ctx.restore();
         }
         drawPodDecals(false, cache.wingStyle, cache.invertWings, cache.decalStyle);
@@ -556,21 +660,136 @@
     // --- 5. ENGINE THRUSTER CHANNELS GATED ---
     if (showThrusters) {
         ctx.fillStyle = '#1e1b18';
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2;
+
         const eS = cache.engineScale;
-        if (cache.engineLayout === 1) {
-            ctx.beginPath(); ctx.moveTo(-5 * eS, 32); ctx.lineTo(5 * eS, 32); ctx.lineTo(8 * eS, 42); ctx.lineTo(-8 * eS, 42); ctx.closePath(); ctx.fill(); ctx.stroke();
-        } else if (cache.engineLayout === 2) {
-            ctx.beginPath(); ctx.moveTo(6 * eS, 32); ctx.lineTo(14 * eS, 32); ctx.lineTo(16 * eS, 42); ctx.lineTo(4 * eS, 42); ctx.closePath(); ctx.fill(); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(-6 * eS, 32); ctx.lineTo(-14 * eS, 32); ctx.lineTo(-16 * eS, 42); ctx.lineTo(-4 * eS, 42); ctx.closePath(); ctx.fill(); ctx.stroke();
-        } else if (cache.engineLayout === 3) {
-            for (let i = 0; i < 8; i++) {
-                ctx.fillRect((-22 + (i * 6)) * eS, 34, 4 * eS, 8);
-                ctx.strokeRect((-22 + (i * 6)) * eS, 34, 4 * eS, 8);
+        const layoutType = cache.engineLayout || 1;
+
+        if (layoutType === 1) {
+            // --- 1. SINGLE CENTRAL NOZZLE ---
+            const nozzleScale = 1.25; const sES = eS * nozzleScale;
+            ctx.beginPath(); 
+            ctx.moveTo(-5 * sES, 34); ctx.lineTo(5 * sES, 34); ctx.lineTo(8 * sES, 48); 
+            ctx.quadraticCurveTo(0, 50 * eS, -8 * sES, 48); 
+            ctx.closePath(); ctx.fill(); ctx.stroke();
+
+            ctx.strokeStyle = cache.trimColor;
+            ctx.beginPath(); ctx.moveTo(-7.5 * sES, 44.5); ctx.quadraticCurveTo(0, 46.5 * eS, 7.5 * sES, 44.5); ctx.stroke();
+
+        } else if (layoutType === 2) {
+            // --- 2. DUAL OUTBOARD PODS ---
+            ctx.beginPath(); ctx.moveTo(6 * eS, 34); ctx.lineTo(14 * eS, 34); ctx.lineTo(16 * eS, 48); ctx.lineTo(4 * eS, 48); ctx.closePath(); ctx.fill(); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(-6 * eS, 34); ctx.lineTo(-14 * eS, 34); ctx.lineTo(-16 * eS, 48); ctx.lineTo(-4 * eS, 48); ctx.closePath(); ctx.fill(); ctx.stroke();
+            ctx.strokeStyle = cache.trimColor; ctx.beginPath(); ctx.moveTo(6.5 * eS, 37.5); ctx.lineTo(13.5 * eS, 37.5); ctx.moveTo(-6.5 * eS, 37.5); ctx.lineTo(-14.5 * eS, 37.5); ctx.stroke();
+
+        } else if (layoutType === 3) {
+            // --- 3. WIDER 6-PILL ARRAY ---
+            const widthStretch = 1.10; 
+            const pillX = [-15, -9, -3, 3, 9, 15].map(x => x * widthStretch); 
+            const pW = 5 * eS * widthStretch; const pH = 12;
+            
+            for (let i = 0; i < 6; i++) {
+                const startX = (pillX[i] * eS) - (pW / 2);
+                let startY = 34;
+                if (i === 1 || i === 4) startY = 36;
+                if (i === 2 || i === 3) startY = 38;
+
+                ctx.fillStyle = '#1e1b18';
+                ctx.fillRect(startX, startY, pW, pH); 
+                ctx.strokeRect(startX, startY, pW, pH);
             }
+
+        } else if (layoutType === 4) {
+            // --- 4. TRIPLE ENGINE BLOCK (Middle engine moved slightly down) ---
+            const baseScale = 1.15; const bES = eS * baseScale;
+            const outLeftX = 7 * bES + 2; const outRightX = 15 * bES + 2;
+
+            // 1. Draw Left & Right Outboard Pods
+            ctx.beginPath(); 
+            ctx.moveTo(outLeftX, 34); ctx.lineTo(outRightX, 34); 
+            ctx.lineTo(outRightX + 2 * bES, 48); ctx.lineTo(outLeftX - 2 * bES, 48); 
+            ctx.closePath(); ctx.fill(); ctx.stroke();
+            
+            ctx.beginPath(); 
+            ctx.moveTo(-outLeftX, 34); ctx.lineTo(-outRightX, 34); 
+            ctx.lineTo(-outRightX - 2 * bES, 48); ctx.lineTo(-outLeftX + 2 * bES, 48); 
+            ctx.closePath(); ctx.fill(); ctx.stroke();
+            
+            // 2. Overlay Extra Large Central Rocket Nozzle (Shifted down from 34 to 37)
+            const middleScale = 1.35; const mES = eS * middleScale;
+            const middleY = 37; // Moved down slightly
+            
+            ctx.beginPath(); 
+            ctx.moveTo(-4 * mES, middleY); ctx.lineTo(4 * mES, middleY); 
+            ctx.lineTo(6.5 * mES, middleY + 14); ctx.lineTo(-6.5 * mES, middleY + 14); 
+            ctx.closePath(); ctx.fill(); ctx.stroke();
+
+            // 3. Apply Matching Flat Accent Stripes (Adjusted center track alignment)
+            ctx.strokeStyle = cache.trimColor;
+            ctx.beginPath();
+            ctx.moveTo(-outRightX - 1 * bES, 44.5); ctx.lineTo(-outLeftX + 1 * bES, 44.5);
+            ctx.moveTo(outLeftX - 1 * bES, 44.5); ctx.lineTo(outRightX + 1 * bES, 44.5);
+            ctx.moveTo(-6 * mES, middleY + 10.5); ctx.lineTo(6 * mES, middleY + 10.5); // Shifts down to match the center drop
+            ctx.stroke();
+
+        } else if (layoutType === 5) {
+            // --- 5. FOUR ENGINE PILLS ---
+            const pillX = [-18, -6, 6, 18];
+            const pW = 7 * eS; const pH = 14;
+            
+            for (let i = 0; i < 4; i++) {
+                const isInner = (i === 1 || i === 2);
+                const currentScale = isInner ? 1.1 : 1.0; 
+                const currentWidth = pW * currentScale; const currentHeight = pH * currentScale;
+                const startY = isInner ? 31 : 34; 
+                const startX = (pillX[i] * eS) - (currentWidth / 2);
+                
+                ctx.fillRect(startX, startY, currentWidth, currentHeight); 
+                ctx.strokeRect(startX, startY, currentWidth, currentHeight);
+                
+                ctx.fillStyle = cache.trimColor; ctx.beginPath(); 
+                ctx.arc(pillX[i] * eS, startY + currentHeight - 2, 2.5 * eS, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#1e1b18';
+            }
+
+        } else if (layoutType === 6) {
+            // --- 6. ALIEN DRIVE CAULDRON ---
+            const cW = 20 * eS; const cH = 12;
+            const alienY = 37; 
+            
+            ctx.beginPath(); 
+            ctx.moveTo(-cW / 2, alienY); ctx.lineTo(cW / 2, alienY); 
+            ctx.bezierCurveTo(cW / 2, alienY + cH * 0.8, cW / 3, alienY + cH, 0, alienY + cH); 
+            ctx.bezierCurveTo(-cW / 3, alienY + cH, -cW / 2, alienY + cH * 0.8, -cW / 2, alienY); 
+            ctx.closePath(); ctx.fill(); ctx.stroke();
+            
+            ctx.strokeStyle = cache.trimColor; ctx.lineWidth = 2;
+            const lineLength = 9;
+            const radialAngles = [Math.PI * 0.85, Math.PI * 0.68, Math.PI * 0.50, Math.PI * 0.32, Math.PI * 0.15];
+            const lineOffsets = [-7, -3.5, 0, 3.5, 7];
+
+            for (let i = 0; i < 5; i++) {
+                const angle = radialAngles[i];
+                const startX = lineOffsets[i] * eS; const startY = alienY + cH - 1.5; 
+                const endX = startX + (Math.cos(angle) * lineLength * eS * 0.7);
+                const endY = startY + (Math.sin(angle) * lineLength);
+                ctx.beginPath(); ctx.moveTo(startX, startY); ctx.lineTo(endX, endY); ctx.stroke();
+            }
+
         } else {
-            for (let i = 0; i < 8; i++) {
-                ctx.fillRect((-22 + (i * 6)) * eS, 34, 4 * eS, 6); ctx.fillRect((-22 + (i * 6)) * eS, 40, 4 * eS, 6);
-                ctx.strokeRect((-22 + (i * 6)) * eS, 34, 4 * eS, 6); ctx.strokeRect((-22 + (i * 6)) * eS, 40, 4 * eS, 6);
+            // --- RECONSTRUCTED 6-PILL BACKUP CONFIGURATION (FALLBACK STATE) ---
+            const widthStretch = 1.10;
+            const pillX = [-15, -9, -3, 3, 9, 15].map(x => x * widthStretch);
+            const pW = 5 * eS * widthStretch; const pH = 12;
+            for (let i = 0; i < 6; i++) {
+                const startX = (pillX[i] * eS) - (pW / 2);
+                let startY = 34;
+                if (i === 1 || i === 4) startY = 36;
+                if (i === 2 || i === 3) startY = 38;
+
+                ctx.fillStyle = '#1e1b18';
+                ctx.fillRect(startX, startY, pW, pH); ctx.strokeRect(startX, startY, pW, pH);
             }
         }
     }
@@ -730,8 +949,8 @@
                 wingStyle: wingStyle,      
                 decalStyle: Math.floor(Math.random() * 3) + 1,     
                 noseStyle: Math.floor(Math.random() * 2) + 1,      
-                engineLayout: Math.floor(Math.random() * 4) + 1,   
-                hasGunPods: Math.random() > 0.4,                   
+                engineLayout: Math.floor(Math.random() * 6) + 1,
+                hasGunPods: Math.random() > 0.5,                   
                 invertWings: invertWings,
                 sizeMult: 0.95, 
                 wingWidthMult: 0.85 + Math.random() * 0.35,  
@@ -770,7 +989,7 @@
             executeProceduralChassisPaths(ctx, cache);
             ctx.restore();
         }
-
+const fleetCaches = [];
         // =========================================================================
         // SECTION 4: FIXED REFORGE MATRIX LOOP WITH TRUE GLOBAL COLOR LOCKS
         // =========================================================================
@@ -789,6 +1008,8 @@
             container.style.gridTemplateColumns = `repeat(${columns}, 120px)`;
             container.style.gap = `${spacing}px`;
             container.innerHTML = ''; 
+            fleetCaches.length = 0;
+            
 
             // Roll a single, master locked theme palette up-front 
             const masterThemeHull = PALLETS[Math.floor(Math.random() * PALLETS.length)];
@@ -796,18 +1017,27 @@
 
             const badgeColors = { 'STANDARD': '#aaaaaa', 'HOMING': '#ff2222', 'SPREAD': '#77cc99', 'DOUBLE': '#00ffff' };
 
-            for (let i = 0; i < totalCount; i++) {
-                const card = document.createElement('div');
-                card.className = 'ship-card';
+                for (let i = 0; i < totalCount; i++) {
+                    const card = document.createElement('div');
+                    card.className = 'ship-card';
 
-                const canvas = document.createElement('canvas');
-                canvas.width = 120; canvas.height = 120;
-                
-                // FIXED COMPILER BOUNDS: Forces the engine to pass the single color variables down cleanly
-                const shipCache = rollProceduralCache(useSingleColor, masterThemeHull, masterThemeTrim);
-                
-                drawProceduralShip(canvas.getContext('2d'), shipCache);
-                card.appendChild(canvas);
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 120;
+                    canvas.height = 120;
+
+                    const shipCache = rollProceduralCache(
+                        useSingleColor,
+                        masterThemeHull,
+                        masterThemeTrim
+                    );
+
+                    // Preserve the exact procedural state used to render this ship.
+                    // The SVG exporter will use this same cache later.
+                    card._shipCache = shipCache;
+
+                    drawProceduralShip(canvas.getContext('2d'), shipCache);
+
+                    card.appendChild(canvas);
 
                 if (displayLabels) {
                     const badge = document.createElement('div');
@@ -884,176 +1114,1110 @@
             }, 'image/png');
         }
 
-        // =========================================================================
-        // PURE VECTOR PATH SVG COMPILER (100% CLEAN FOR ADOBE ILLUSTRATOR)
-        // =========================================================================
-        function exportFleetAsSVG() {
-            const cards = document.querySelectorAll('.ship-card');
-            if (cards.length === 0) return;
 
-            const columns = parseInt(document.getElementById('input-columns').value) || 8;
-            const spacing = parseInt(document.getElementById('input-spacing').value) || 6;
-            const totalRows = Math.ceil(cards.length / columns);
 
-            const gridWidth = columns * 120 + (columns - 1) * spacing;
-            const gridHeight = totalRows * 120 + (totalRows - 1) * spacing;
 
-            // Fetch current layer filters checkbox toggles from your interface
-            const showWings = document.getElementById('toggle-wings').checked;
-            const showPods = document.getElementById('toggle-pods').checked;
-            const showHull = document.getElementById('toggle-hull').checked;
-            const showDecals = document.getElementById('toggle-decals').checked;
-            const showThrusters = document.getElementById('toggle-thrusters').checked;
-            const displayLabels = document.getElementById('toggle-label').checked;
 
-            const uiDegrees = parseFloat(document.getElementById('input-rotation').value) || 0;
-            const finalRotationAngle = (uiDegrees * Math.PI) / 180;
 
-            const uiScalePercent = parseFloat(document.getElementById('input-scale').value) || 100;
-            const globalScaleFactor = 0.72 * (uiScalePercent / 100);
 
-            // Create valid XML document headers formatted for pure mathematical vector layouts
-            let svg = `<?xml version="1.0" encoding="utf-8"?>\n`;
-            svg += `<svg version="1.1" xmlns="http://w3.org" xmlns:xlink="http://w3.org" width="${gridWidth}" height="${gridHeight}" viewBox="0 0 ${gridWidth} ${gridHeight}">\n`;
-            
-            // Add a dark baseline background workspace rectangle layout sheet
-            svg += `  <rect width="100%" height="100%" fill="#0b0c10" />\n`;
+// =========================================================================
+// STEP 2: CANVAS-STYLE SVG VECTOR RECORDER
+// Runs the exact same procedural ship drawing code,
+// but records the Canvas paths as real SVG vector geometry.
+// =========================================================================
+function createSVGVectorContext() {
 
-            const badgeColors = { 'STANDARD': '#aaaaaa', 'HOMING': '#ff2222', 'SPREAD': '#77cc99', 'DOUBLE': '#00ffff' };
+    let output = '';
+    let currentPath = [];
+    let currentX = 0;
+    let currentY = 0;
+    let hasCurrentPoint = false;
 
-            // LOOP STRUCTURE: Recreates vector coordinates entirely from structural data parameters
-            cards.forEach((card, index) => {
-                const col = index % columns;
-                const row = Math.floor(index / columns);
-                const cellX = col * (120 + spacing);
-                const cellY = row * (120 + spacing);
+    let fillStyle = '#000000';
+    let strokeStyle = '#000000';
+    let lineWidth = 1;
+    let lineJoin = 'miter';
+    let lineCap = 'butt';
+    let miterLimit = 10;
 
-                // FIXED: Re-roll individual properties using your seed function to generate pure paths math
-                const cache = rollProceduralCache(); 
-                const radius = 18 * cache.sizeMult;
-                const wM = cache.wingWidthMult;
-                const pM = cache.podLengthMult;
-                const eS = cache.engineScale;
-                const noseY = (cache.noseStyle === 2) ? -66 : -44;
+    let shadowBlur = 0;
+    let shadowColor = 'transparent';
 
-                // Open grid location grouping tags
-                svg += `  <g transform="translate(${cellX}, ${cellY})">\n`;
-                svg += `    <rect width="120" height="120" fill="rgba(0,0,0,0.4)" stroke="#222" stroke-width="1" />\n`;
+    const stateStack = [];
+    let transformStack = [];
 
-                const finalScale = globalScaleFactor * cache.sizeMult;
-                const totalRotationInRadians = finalRotationAngle - (Math.PI / 2);
-                
-                // Nested transformation alignment node for scaling and rotation
-                svg += `    <g transform="translate(60, 60) rotate(${totalRotationInRadians * 180 / Math.PI}) scale(${finalScale})">\n`;
+    function esc(value) {
+        return String(value)
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+    }
 
-                // Vector string compiler path subroutine
-                function buildWingPath(isLeft) {
-                    const scaleX = isLeft ? -1 : 1;
-                    const scaleY = cache.invertWings ? -1 : 1;
-                    let d = '';
+    function styleString(fill, stroke) {
 
-                    if (cache.wingStyle === 1) { // SLICKBACK
-                        if (cache.invertWings) {
-                            d = `M ${10 * scaleX} ${-20 * pM * scaleY} C ${34 * wM * scaleX} ${10 * pM * scaleY} ${54 * wM * scaleX} ${26 * pM * scaleY} ${54 * wM * scaleX} ${34 * pM * scaleY} C ${54 * wM * scaleX} ${40 * pM * scaleY} ${42 * wM * scaleX} ${40 * pM * scaleY} ${24 * wM * scaleX} ${38 * pM * scaleY} L ${10 * scaleX} ${42 * pM * scaleY} L 0 ${44 * pM * scaleY} Z`;
-                        } else {
-                            d = `M ${10 * scaleX} ${-20 * pM * scaleY} L ${54 * wM * scaleX} ${40 * pM * scaleY} L ${24 * wM * scaleX} ${38 * pM * scaleY} L ${10 * scaleX} ${42 * pM * scaleY} L 0 ${44 * pM * scaleY} Z`;
-                        }
-                    } else if (cache.wingStyle === 2) { // HEAVY FLAPS
-                        d = `M ${0} ${44 * pM * scaleY} L ${22 * wM * scaleX} ${17 * pM * scaleY} A ${21 * pM} ${21 * pM} 0 0 0 ${22 * wM * scaleX} ${-25 * pM * scaleY} L ${16 * wM * scaleX} ${5 * pM * scaleY} A ${17 * pM} ${17 * pM} 0 0 0 ${16 * wM * scaleX} ${39 * pM * scaleY} Z`;
-                    } else if (cache.wingStyle === 3) { // STINGER
-                        d = `M ${10 * scaleX} ${-20 * pM * scaleY} L ${38 * wM * scaleX} ${4 * pM * scaleY} L ${38 * wM * scaleX} ${-32 * pM * scaleY} L ${44 * wM * scaleX} ${26 * pM * scaleY} L ${32 * wM * scaleX} ${22 * pM * scaleY} L 0 ${44 * pM * scaleY} Z`;
-                    } else if (cache.wingStyle === 4) { // TRIPLE PODS
-                        d = `M ${0} ${44 * pM * scaleY} L ${20 * wM * scaleX} ${-1 * pM * scaleY} A ${13 * pM} ${13 * pM} 0 0 0 ${20 * wM * scaleX} ${-27 * pM * scaleY} L ${22 * wM * scaleX} ${-10 * pM * scaleY} A ${16 * pM} ${16 * pM} 0 0 0 ${22 * wM * scaleX} ${22 * pM * scaleY} L ${20 * wM * scaleX} ${11 * pM * scaleY} A ${13 * pM} ${13 * pM} 0 0 0 ${20 * wM * scaleX} ${37 * pM * scaleY} Z`;
-                    } else { // MINIMAL
-                        d = `M ${10 * scaleX} ${-18 * pM * scaleY} L ${22 * wM * scaleX} ${-18 * pM * scaleY} L ${24 * wM * scaleX} ${-14 * pM * scaleY} L ${24 * wM * scaleX} ${34 * pM * scaleY} C ${24 * wM * scaleX} ${42 * pM * scaleY} ${14 * wM * scaleX} ${42 * pM * scaleY} ${12 * wM * scaleX} ${40 * pM * scaleY} L 0 ${44 * pM * scaleY} Z`;
-                    }
-                    return `<path d="${d}" fill="${cache.hullColor}" stroke="#ffffff" stroke-width="1.5" />`;
-                }
+        let style = '';
 
-                // 1. Draw Outer Wing Backdrops & Frame Silhouettes
-                if (showWings) {
-                    svg += `      <rect x="${-22 * wM}" y="-18" width="${44 * wM}" height="${60 * pM}" fill="#ffffff" stroke="#ffffff" stroke-width="3" />\n`;
-                    svg += `      ${buildWingPath(false).replace(/fill=".*?"/, 'fill="#ffffff" stroke="#ffffff" stroke-width="3"')}\n`;
-                    svg += `      ${buildWingPath(true).replace(/fill=".*?"/, 'fill="#ffffff" stroke="#ffffff" stroke-width="3"')}\n`;
-                }
-
-                // 2. Draw Nose Frame Silhouettes Underlays
-                if (showHull) {
-                    svg += `      <path d="M 0 ${noseY} L 5 ${noseY + 4} L 5 44 L -5 44 L -5 ${noseY + 4} Z" fill="#ffffff" stroke="#ffffff" stroke-width="3" />\n`;
-                }
-
-                // 3. Draw Interior Main Wing Plates Covers
-                if (showWings) {
-                    svg += `      <rect x="${-20 * wM}" y="-16" width="${40 * wM}" height="${56 * pM}" fill="#1e1b18" />\n`;
-                    svg += `      ${buildWingPath(false)}\n`;
-                    svg += `      ${buildWingPath(true)}\n`;
-                }
-
-                // 4. Draw Inner Core Fuselage Panels
-                if (showHull) {
-                    svg += `      <path d="M 0 ${noseY + 12} C 5 ${noseY + 12} 7 -20 7 -10 L 7 32 C 3 36 -3 36 -7 32 L -7 -10 C -7 -20 -5 ${noseY + 12} 0 ${noseY + 12} Z" fill="#1e1b18" stroke="#ffffff" stroke-width="2" />\n`;
-                }
-
-                // 5. Draw Decorative Accent Decals
-                if (showWings && showDecals) {
-                    const scaleY = cache.invertWings ? -1 : 1;
-                    if (cache.wingStyle === 2) {
-                        svg += `      <circle cx="${22 * wM}" cy="${-4 * pM * scaleY}" r="${6}" fill="${cache.trimColor}" />\n`;
-                        svg += `      <circle cx="${-22 * wM}" cy="${-4 * pM * scaleY}" r="${6}" fill="${cache.trimColor}" />\n`;
-                    } else if (cache.wingStyle === 5) {
-                        svg += `      <rect x="${13 * wM}" y="${-4 * pM * scaleY}" width="6" height="3" fill="${cache.trimColor}" />\n`;
-                        svg += `      <rect x="${-13 * wM - 6}" y="${-4 * pM * scaleY}" width="6" height="3" fill="${cache.trimColor}" />\n`;
-                    }
-                }
-
-                // 6. Draw Engine Jet Configurations
-                if (showThrusters) {
-                    if (cache.engineLayout === 1) {
-                        svg += `      <path d="M ${-5 * eS} 32 L ${5 * eS} 32 L ${8 * eS} 42 L ${-8 * eS} 42 Z" fill="#1e1b18" stroke="#ffffff" stroke-width="1.5" />\n`;
-                        svg += `      <rect x="${-4 * eS}" y="42" width="${8 * eS}" height="6" fill="#ff5500" />\n`;
-                    } else {
-                        svg += `      <rect x="${-12 * eS}" y="32" width="${6 * eS}" height="8" fill="#ff5500" stroke="#ffffff" stroke-width="1" />\n`;
-                        svg += `      <rect x="${6 * eS}" y="32" width="${6 * eS}" height="8" fill="#ff5500" stroke="#ffffff" stroke-width="1" />\n`;
-                    }
-                }
-
-                // 7. Draw Wing Gun Pod Barrels
-                if (showPods && cache.hasGunPods) {
-                    svg += `      <rect x="10" y="-20" width="2" height="24" fill="#ffffff" />\n`;
-                    svg += `      <rect x="-12" y="-20" width="2" height="24" fill="#ffffff" />\n`;
-                }
-
-                // 8. Draw Central Cockpit Glass Frames
-                if (showDecals) {
-                    svg += `      <path d="M -4 -2 A 4 4 0 0 1 4 -2 Z" fill="#ffffff" stroke="#ffffff" stroke-width="1" />\n`;
-                    svg += `      <line x1="-4" y1="4" x2="4" y2="4" stroke="#ffffff" stroke-width="2" />\n`;
-                    svg += `      <rect x="-3" y="16" width="6" height="8" fill="none" stroke="${cache.trimColor}" stroke-width="2" />\n`;
-                }
-
-                svg += `    </g>\n`; // Closes nested local canvas transformation node cleanly
-
-                // 9. Overlay Text Ribbon Struts
-                if (displayLabels) {
-                    svg += `    <rect y="106" width="120" height="14" fill="rgba(0,0,0,0.75)" />\n`;
-                    svg += `    <text x="60" y="115" fill="${badgeColors[cache.weaponTrait]}" font-family="monospace" font-size="8px" font-weight="900" text-anchor="middle" letter-spacing="0.5px">${cache.weaponTrait}</text>\n`;
-                }
-
-                svg += `  </g>\n`; // Closes cell tracking matrix container tag
-            });
-
-            svg += `</svg>`;
-
-            // Trigger the native vector save file download prompt box natively
-            const svgBlob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
-            const downloadLink = document.createElement('a');
-            downloadLink.download = 'procedural_fleet_sheet.svg';
-            downloadLink.href = URL.createObjectURL(svgBlob);
-            downloadLink.click();
+        if (fill) {
+            style += `fill:${esc(fill)};`;
+        } else {
+            style += 'fill:none;';
         }
 
-        window.onload = generateFleetSheet;
+        if (stroke) {
+            style += `stroke:${esc(stroke)};`;
+        } else {
+            style += 'stroke:none;';
+        }
 
-        // copyright smurphshire 2026
+        style += `stroke-width:${lineWidth};`;
+        style += `stroke-linejoin:${lineJoin};`;
+        style += `stroke-linecap:${lineCap};`;
+        style += `stroke-miterlimit:${miterLimit};`;
+
+        return style;
+    }
+
+    function shadowFilter() {
+
+        if (!shadowBlur || shadowBlur <= 0) {
+            return '';
+        }
+
+        if (!shadowColor || shadowColor === 'transparent') {
+            return '';
+        }
+
+        const filterId = 'shipGlowFilter';
+
+        if (!output.includes(`id="${filterId}"`)) {
+
+            output =
+                `<defs>` +
+                `<filter id="${filterId}" ` +
+                `x="-100%" y="-100%" width="300%" height="300%">` +
+                `<feGaussianBlur stdDeviation="${shadowBlur / 2}" />` +
+                `</filter>` +
+                `</defs>` +
+                output;
+        }
+
+        return `filter="url(#${filterId})"`;
+    }
+
+    function pathData() {
+        return currentPath.join(' ');
+    }
+
+    function emitPath(fill, stroke) {
+
+        if (!currentPath.length) {
+            return;
+        }
+
+        output +=
+            `<path d="${esc(pathData())}" ` +
+            `style="${styleString(fill, stroke)}" ` +
+            `${shadowFilter()}/>\n`;
+    }
+
+    function distance(x1, y1, x2, y2) {
+
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    return {
+
+        // -------------------------------------------------------------
+        // Canvas state
+        // -------------------------------------------------------------
+
+        save() {
+
+            stateStack.push({
+                fillStyle,
+                strokeStyle,
+                lineWidth,
+                lineJoin,
+                lineCap,
+                miterLimit,
+                shadowBlur,
+                shadowColor,
+                transformStack: transformStack.slice()
+            });
+
+            output += '<g>\n';
+        },
+
+        restore() {
+
+            if (stateStack.length) {
+
+                const state =
+                    stateStack.pop();
+
+                fillStyle = state.fillStyle;
+                strokeStyle = state.strokeStyle;
+                lineWidth = state.lineWidth;
+                lineJoin = state.lineJoin;
+                lineCap = state.lineCap;
+                miterLimit = state.miterLimit;
+                shadowBlur = state.shadowBlur;
+                shadowColor = state.shadowColor;
+                transformStack = state.transformStack;
+            }
+
+            output += '</g>\n';
+        },
+
+        translate(x, y) {
+
+            output +=
+                `<g transform="translate(${x} ${y})">\n`;
+
+            transformStack.push('translate');
+        },
+
+        rotate(angle) {
+
+            const degrees =
+                angle * 180 / Math.PI;
+
+            output +=
+                `<g transform="rotate(${degrees})">\n`;
+
+            transformStack.push('rotate');
+        },
+
+        scale(x, y) {
+
+            output +=
+                `<g transform="scale(${x} ${y})">\n`;
+
+            transformStack.push('scale');
+        },
+
+        // -------------------------------------------------------------
+        // Canvas style properties
+        // -------------------------------------------------------------
+
+        set fillStyle(value) {
+            fillStyle = value;
+        },
+
+        get fillStyle() {
+            return fillStyle;
+        },
+
+        set strokeStyle(value) {
+            strokeStyle = value;
+        },
+
+        get strokeStyle() {
+            return strokeStyle;
+        },
+
+        set lineWidth(value) {
+            lineWidth = value;
+        },
+
+        get lineWidth() {
+            return lineWidth;
+        },
+
+        set lineJoin(value) {
+            lineJoin = value;
+        },
+
+        get lineJoin() {
+            return lineJoin;
+        },
+
+        set lineCap(value) {
+            lineCap = value;
+        },
+
+        get lineCap() {
+            return lineCap;
+        },
+
+        set miterLimit(value) {
+            miterLimit = value;
+        },
+
+        get miterLimit() {
+            return miterLimit;
+        },
+
+        set shadowBlur(value) {
+            shadowBlur = value;
+        },
+
+        get shadowBlur() {
+            return shadowBlur;
+        },
+
+        set shadowColor(value) {
+            shadowColor = value;
+        },
+
+        get shadowColor() {
+            return shadowColor;
+        },
+
+        // -------------------------------------------------------------
+        // Path commands
+        // -------------------------------------------------------------
+
+        beginPath() {
+
+            currentPath = [];
+            hasCurrentPoint = false;
+        },
+
+        closePath() {
+
+            currentPath.push('Z');
+        },
+
+        moveTo(x, y) {
+
+            currentPath.push(
+                `M ${x} ${y}`
+            );
+
+            currentX = x;
+            currentY = y;
+            hasCurrentPoint = true;
+        },
+
+        lineTo(x, y) {
+
+            if (!hasCurrentPoint) {
+
+                currentPath.push(
+                    `M ${x} ${y}`
+                );
+
+            } else {
+
+                currentPath.push(
+                    `L ${x} ${y}`
+                );
+            }
+
+            currentX = x;
+            currentY = y;
+            hasCurrentPoint = true;
+        },
+
+        bezierCurveTo(
+            cp1x, cp1y,
+            cp2x, cp2y,
+            x, y
+        ) {
+
+            if (!hasCurrentPoint) {
+
+                currentPath.push(
+                    `M ${x} ${y}`
+                );
+
+            } else {
+
+                currentPath.push(
+                    `C ${cp1x} ${cp1y} ` +
+                    `${cp2x} ${cp2y} ` +
+                    `${x} ${y}`
+                );
+            }
+
+            currentX = x;
+            currentY = y;
+            hasCurrentPoint = true;
+        },
+
+        quadraticCurveTo(
+            cpx, cpy,
+            x, y
+        ) {
+
+            if (!hasCurrentPoint) {
+
+                currentPath.push(
+                    `M ${x} ${y}`
+                );
+
+            } else {
+
+                currentPath.push(
+                    `Q ${cpx} ${cpy} ${x} ${y}`
+                );
+            }
+
+            currentX = x;
+            currentY = y;
+            hasCurrentPoint = true;
+        },
+
+        // -------------------------------------------------------------
+        // ARC
+        // -------------------------------------------------------------
+
+        arc(
+            cx,
+            cy,
+            radius,
+            startAngle,
+            endAngle,
+            anticlockwise
+        ) {
+
+            let start = startAngle;
+            let end = endAngle;
+
+            const TWO_PI =
+                Math.PI * 2;
+
+            if (!anticlockwise) {
+
+                while (end < start) {
+                    end += TWO_PI;
+                }
+
+                if (end - start > TWO_PI) {
+                    end = start + TWO_PI;
+                }
+
+            } else {
+
+                while (end > start) {
+                    end -= TWO_PI;
+                }
+
+                if (start - end > TWO_PI) {
+                    end = start - TWO_PI;
+                }
+            }
+
+            const totalAngle =
+                end - start;
+
+            const startX =
+                cx + radius * Math.cos(start);
+
+            const startY =
+                cy + radius * Math.sin(start);
+
+            const endX =
+                cx + radius * Math.cos(end);
+
+            const endY =
+                cy + radius * Math.sin(end);
+
+            // Full circle
+            if (
+                Math.abs(totalAngle) >=
+                TWO_PI - 0.0001
+            ) {
+
+                const midX =
+                    cx +
+                    radius *
+                    Math.cos(
+                        start +
+                        totalAngle / 2
+                    );
+
+                const midY =
+                    cy +
+                    radius *
+                    Math.sin(
+                        start +
+                        totalAngle / 2
+                    );
+
+                if (
+                    hasCurrentPoint &&
+                    distance(
+                        currentX,
+                        currentY,
+                        startX,
+                        startY
+                    ) > 0.0001
+                ) {
+
+                    currentPath.push(
+                        `L ${startX} ${startY}`
+                    );
+                }
+
+                if (!hasCurrentPoint) {
+
+                    currentPath.push(
+                        `M ${startX} ${startY}`
+                    );
+                }
+
+                currentPath.push(
+                    `A ${radius} ${radius} 0 1 ` +
+                    `${anticlockwise ? 0 : 1} ` +
+                    `${midX} ${midY} ` +
+                    `A ${radius} ${radius} 0 1 ` +
+                    `${anticlockwise ? 0 : 1} ` +
+                    `${startX} ${startY}`
+                );
+
+            } else {
+
+                const largeArc =
+                    Math.abs(totalAngle) >
+                    Math.PI ? 1 : 0;
+
+                const sweep =
+                    anticlockwise ? 0 : 1;
+
+                if (!hasCurrentPoint) {
+
+                    currentPath.push(
+                        `M ${startX} ${startY}`
+                    );
+
+                } else if (
+                    distance(
+                        currentX,
+                        currentY,
+                        startX,
+                        startY
+                    ) > 0.0001
+                ) {
+
+                    currentPath.push(
+                        `L ${startX} ${startY}`
+                    );
+                }
+
+                currentPath.push(
+                    `A ${radius} ${radius} 0 ` +
+                    `${largeArc} ${sweep} ` +
+                    `${endX} ${endY}`
+                );
+            }
+
+            currentX = endX;
+            currentY = endY;
+            hasCurrentPoint = true;
+        },
+
+        // -------------------------------------------------------------
+        // ARC TO
+        //
+        // Canvas:
+        // arcTo(x1, y1, x2, y2, radius)
+        //
+        // Creates a tangent line from the current point
+        // toward x1/y1, followed by a circular arc toward x2/y2.
+        // -------------------------------------------------------------
+
+        arcTo(
+            x1,
+            y1,
+            x2,
+            y2,
+            radius
+        ) {
+
+            // Canvas behavior:
+            // If there is no current point, arcTo behaves
+            // like moveTo(x1, y1).
+
+            if (!hasCurrentPoint) {
+
+                currentPath.push(
+                    `M ${x1} ${y1}`
+                );
+
+                currentX = x1;
+                currentY = y1;
+                hasCurrentPoint = true;
+
+                return;
+            }
+
+            // Zero radius is effectively a line.
+            if (
+                radius === 0
+            ) {
+
+                currentPath.push(
+                    `L ${x1} ${y1}`
+                );
+
+                currentX = x1;
+                currentY = y1;
+
+                return;
+            }
+
+            const p0x = currentX;
+            const p0y = currentY;
+
+            const p1x = x1;
+            const p1y = y1;
+
+            const p2x = x2;
+            const p2y = y2;
+
+            const v1x =
+                p0x - p1x;
+
+            const v1y =
+                p0y - p1y;
+
+            const v2x =
+                p2x - p1x;
+
+            const v2y =
+                p2y - p1y;
+
+            const len1 =
+                Math.sqrt(
+                    v1x * v1x +
+                    v1y * v1y
+                );
+
+            const len2 =
+                Math.sqrt(
+                    v2x * v2x +
+                    v2y * v2y
+                );
+
+            // Degenerate geometry:
+            // current point == corner or corner == destination.
+            if (
+                len1 < 0.000001 ||
+                len2 < 0.000001
+            ) {
+
+                currentPath.push(
+                    `L ${p1x} ${p1y}`
+                );
+
+                currentX = p1x;
+                currentY = p1y;
+
+                return;
+            }
+
+            // Normalize both vectors.
+            const u1x =
+                v1x / len1;
+
+            const u1y =
+                v1y / len1;
+
+            const u2x =
+                v2x / len2;
+
+            const u2y =
+                v2y / len2;
+
+            // Angle between the two vectors.
+            let dot =
+                u1x * u2x +
+                u1y * u2y;
+
+            dot =
+                Math.max(
+                    -1,
+                    Math.min(1, dot)
+                );
+
+            const angle =
+                Math.acos(dot);
+
+            // Straight line or 180-degree turn.
+            if (
+                angle < 0.000001 ||
+                Math.abs(
+                    Math.PI - angle
+                ) < 0.000001
+            ) {
+
+                currentPath.push(
+                    `L ${p1x} ${p1y}`
+                );
+
+                currentX = p1x;
+                currentY = p1y;
+
+                return;
+            }
+
+            // Tangent distance from the corner.
+            const tangentDistance =
+                radius /
+                Math.tan(angle / 2);
+
+            // Prevent the radius from creating
+            // a tangent point beyond either segment.
+            const maxTangent =
+                Math.min(
+                    len1,
+                    len2
+                );
+
+            const actualTangent =
+                Math.min(
+                    tangentDistance,
+                    maxTangent
+                );
+
+            // Actual radius after limiting the tangent.
+            const actualRadius =
+                actualTangent *
+                Math.tan(angle / 2);
+
+            // First tangent point.
+            const tangent1x =
+                p1x +
+                u1x *
+                actualTangent;
+
+            const tangent1y =
+                p1y +
+                u1y *
+                actualTangent;
+
+            // Second tangent point.
+            const tangent2x =
+                p1x +
+                u2x *
+                actualTangent;
+
+            const tangent2y =
+                p1y +
+                u2y *
+                actualTangent;
+
+            // Draw the straight section to the
+            // first tangent point.
+            currentPath.push(
+                `L ${tangent1x} ${tangent1y}`
+            );
+
+            // Determine SVG sweep direction.
+            const cross =
+                u1x * u2y -
+                u1y * u2x;
+
+            const sweep =
+                cross < 0 ? 1 : 0;
+
+            // arcTo is always a circular corner.
+            currentPath.push(
+                `A ${actualRadius} ${actualRadius} 0 ` +
+                `0 ${sweep} ` +
+                `${tangent2x} ${tangent2y}`
+            );
+
+            currentX = tangent2x;
+            currentY = tangent2y;
+            hasCurrentPoint = true;
+        },
+
+        // -------------------------------------------------------------
+        // Rectangle commands
+        // -------------------------------------------------------------
+
+        fillRect(
+            x,
+            y,
+            width,
+            height
+        ) {
+
+            output +=
+                `<rect x="${x}" y="${y}" ` +
+                `width="${width}" ` +
+                `height="${height}" ` +
+                `style="${styleString(
+                    fillStyle,
+                    null
+                )}" ` +
+                `${shadowFilter()}/>\n`;
+        },
+
+        strokeRect(
+            x,
+            y,
+            width,
+            height
+        ) {
+
+            output +=
+                `<rect x="${x}" y="${y}" ` +
+                `width="${width}" ` +
+                `height="${height}" ` +
+                `style="${styleString(
+                    null,
+                    strokeStyle
+                )}" ` +
+                `${shadowFilter()}/>\n`;
+        },
+
+        // -------------------------------------------------------------
+        // Paint current path
+        // -------------------------------------------------------------
+
+        fill() {
+
+            emitPath(
+                fillStyle,
+                null
+            );
+        },
+
+        stroke() {
+
+            emitPath(
+                null,
+                strokeStyle
+            );
+        },
+
+        // -------------------------------------------------------------
+        // Final SVG contents
+        // -------------------------------------------------------------
+
+        getSVG() {
+
+            return output;
+        }
+    };
+}
+
+
+
+
+
+
+
+
+function exportFleetAsSVG() {
+
+    const cards =
+        document.querySelectorAll('.ship-card');
+
+    if (!cards.length) {
+        return;
+    }
+
+    const columns =
+        parseInt(
+            document.getElementById('input-columns').value
+        ) || 8;
+
+    const spacing =
+        parseInt(
+            document.getElementById('input-spacing').value
+        ) || 6;
+
+    const displayLabels =
+        document.getElementById('toggle-label').checked;
+
+    const cellSize = 120;
+
+    const rows =
+        Math.ceil(
+            cards.length / columns
+        );
+
+    const width =
+        columns * cellSize +
+        (columns - 1) * spacing;
+
+    const height =
+        rows * cellSize +
+        (rows - 1) * spacing;
+
+
+    // -------------------------------------------------------------
+    // SVG HEADER
+    // -------------------------------------------------------------
+
+    let svg =
+        '<?xml version="1.0" encoding="UTF-8"?>\n' +
+        '<svg ' +
+        'xmlns="http://www.w3.org/2000/svg" ' +
+        'xmlns:xlink="http://www.w3.org/1999/xlink" ' +
+        'version="1.1" ' +
+        'width="' + width + '" ' +
+        'height="' + height + '" ' +
+        'viewBox="0 0 ' + width + ' ' + height + '">\n';
+
+
+    // -------------------------------------------------------------
+    // DEFINITIONS
+    // -------------------------------------------------------------
+
+    svg +=
+        '<defs>\n' +
+        '</defs>\n';
+
+
+    // -------------------------------------------------------------
+    // FLEET BACKGROUND
+    // -------------------------------------------------------------
+
+    svg +=
+        '<rect ' +
+        'x="0" ' +
+        'y="0" ' +
+        'width="' + width + '" ' +
+        'height="' + height + '" ' +
+        'fill="#0b0c10"/>\n';
+
+
+    // -------------------------------------------------------------
+    // SHIPS
+    // -------------------------------------------------------------
+
+    cards.forEach(function(card, index) {
+
+        const cache =
+            card._shipCache;
+
+        if (!cache) {
+            return;
+        }
+
+
+        const col =
+            index % columns;
+
+        const row =
+            Math.floor(
+                index / columns
+            );
+
+
+        const x =
+            col *
+            (cellSize + spacing);
+
+        const y =
+            row *
+            (cellSize + spacing);
+
+
+        // ---------------------------------------------------------
+        // CELL BACKGROUND
+        // ---------------------------------------------------------
+
+        svg +=
+            '<rect ' +
+            'x="' + x + '" ' +
+            'y="' + y + '" ' +
+            'width="' + cellSize + '" ' +
+            'height="' + cellSize + '" ' +
+            'fill="#000000" ' +
+            'fill-opacity="0.4" ' +
+            'stroke="#222222" ' +
+            'stroke-width="1"/>\n';
+
+
+        // ---------------------------------------------------------
+        // CREATE FRESH VECTOR CONTEXT
+        // ---------------------------------------------------------
+
+        const svgCtx =
+            createSVGVectorContext();
+
+
+        // ---------------------------------------------------------
+        // RUN EXISTING PROCEDURAL SHIP RENDERER
+        // ---------------------------------------------------------
+
+        drawProceduralShip(
+            svgCtx,
+            cache
+        );
+
+
+        let shipSVG =
+            svgCtx.getSVG();
+
+
+        // ---------------------------------------------------------
+        // PLACE SHIP INTO ITS CELL
+        // ---------------------------------------------------------
+
+        svg +=
+            '<g transform="translate(' +
+            x + ' ' +
+            y +
+            ')">\n';
+
+        svg += shipSVG;
+
+        svg +=
+            '</g>\n';
+
+
+        // ---------------------------------------------------------
+        // TRAIT LABEL
+        // ---------------------------------------------------------
+
+        if (displayLabels) {
+
+            const badge =
+                card.querySelector(
+                    '.trait-badge'
+                );
+
+            if (badge) {
+
+                const computedStyle =
+                    window.getComputedStyle(
+                        badge
+                    );
+
+                let color =
+                    computedStyle.color ||
+                    '#ffffff';
+
+
+                // Convert rgb(...) to a valid SVG color.
+                // Illustrator handles rgb() reliably.
+                if (
+                    color &&
+                    color.indexOf('rgb') === 0
+                ) {
+                    color =
+                        color
+                            .replace(
+                                /^rgba?\(/,
+                                'rgb('
+                            )
+                            .replace(
+                                /\)$/,
+                                ')'
+                            );
+                }
+
+
+                const text =
+                    badge.innerText
+                        .replace(
+                            /&/g,
+                            '&amp;'
+                        )
+                        .replace(
+                            /</g,
+                            '&lt;'
+                        )
+                        .replace(
+                            />/g,
+                            '&gt;'
+                        )
+                        .replace(
+                            /"/g,
+                            '&quot;'
+                        );
+
+
+                svg +=
+                    '<rect ' +
+                    'x="' + x + '" ' +
+                    'y="' + (y + 106) + '" ' +
+                    'width="' + cellSize + '" ' +
+                    'height="14" ' +
+                    'fill="#000000" ' +
+                    'fill-opacity="0.65"/>\n';
+
+
+                svg +=
+                    '<text ' +
+                    'x="' + (x + 60) + '" ' +
+                    'y="' + (y + 115) + '" ' +
+                    'fill="' + color + '" ' +
+                    'font-family="monospace" ' +
+                    'font-size="8" ' +
+                    'font-weight="900" ' +
+                    'text-anchor="middle">' +
+                    text +
+                    '</text>\n';
+            }
+        }
+
+    });
+
+
+    // -------------------------------------------------------------
+    // CLOSE SVG
+    // -------------------------------------------------------------
+
+    svg +=
+        '</svg>';
+
+
+    // -------------------------------------------------------------
+    // DOWNLOAD
+    // -------------------------------------------------------------
+
+    const blob =
+        new Blob(
+            [svg],
+            {
+                type:
+                    'image/svg+xml;charset=utf-8'
+            }
+        );
+
+
+    const url =
+        URL.createObjectURL(
+            blob
+        );
+
+
+    const link =
+        document.createElement('a');
+
+    link.href = url;
+
+    link.download =
+        'procedural_fleet_sheet.svg';
+
+
+    document.body.appendChild(
+        link
+    );
+
+    link.click();
+
+    document.body.removeChild(
+        link
+    );
+
+
+    setTimeout(
+        function() {
+
+            URL.revokeObjectURL(
+                url
+            );
+
+        },
+        1000
+    );
+}
+
+        window.onload = generateFleetSheet;
     </script>
 </body>
 </html>
