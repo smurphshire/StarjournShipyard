@@ -96,121 +96,763 @@
             background: rgba(0, 0, 0, 0.75);
             padding: 1px 0;
         }
+
+/* ============================================================
+FLEET FORGE — SIDEBAR LAYOUT
+============================================================ */
+
+.fleet-layout {
+display: flex;
+width: 100%;
+min-height: calc(100vh - 40px);
+box-sizing: border-box;
+gap: 0;
+}
+
+/* ============================================================
+SIDEBAR
+============================================================ */
+
+.fleet-sidebar {
+width: 245px;
+min-width: 245px;
+max-width: 245px;
+
+background: #111318;
+
+border: 1px solid #292c32;
+border-radius: 6px;
+
+box-sizing: border-box;
+
+padding: 0;
+
+overflow-y: auto;
+overflow-x: hidden;
+
+max-height: calc(100vh - 40px);
+
+scrollbar-width: thin;
+scrollbar-color: #333 #111318;
+  
+
+}
+
+/* ============================================================
+SIDEBAR HEADER
+============================================================ */
+
+.sidebar-header {
+padding: 16px 15px 13px 15px;
+
+  
+background:
+    linear-gradient(
+        135deg,
+        rgba(255,157,66,.09),
+        rgba(255,157,66,.015)
+    );
+
+border-bottom: 1px solid #303238;
+  
+
+}
+
+.sidebar-title {
+color: #ff9d42;
+
+  
+font-size: 15px;
+font-weight: 900;
+
+letter-spacing: 1.5px;
+
+line-height: 1;
+  
+
+}
+
+.sidebar-subtitle {
+color: #555a63;
+
+  
+font-size: 8px;
+font-weight: bold;
+
+letter-spacing: 1.2px;
+
+margin-top: 5px;
+  
+
+}
+
+/* ============================================================
+SECTIONS
+============================================================ */
+
+.sidebar-section {
+padding: 12px 13px;
+
+  
+border-bottom: 1px solid #24262b;
+  
+
+}
+
+.section-title {
+color: #777d86;
+
+  
+font-size: 8px;
+font-weight: 900;
+
+letter-spacing: 1px;
+text-transform: uppercase;
+
+margin-bottom: 8px;
+  
+
+}
+
+.red-title {
+color: #c95454;
+}
+
+.gold-title {
+color: #c9a961;
+}
+
+.green-title {
+color: #7faa83;
+}
+
+/* ============================================================
+NUMBER INPUTS
+============================================================ */
+
+.number-grid {
+display: grid;
+
+  
+grid-template-columns: 1fr 1fr;
+
+gap: 8px;
+  
+
+}
+
+.control-group {
+display: flex;
+flex-direction: column;
+
+  
+gap: 3px;
+  
+
+}
+
+.control-group.full-width {
+grid-column: span 2;
+}
+
+.control-group label {
+color: #676c74;
+
+  
+font-size: 8px;
+font-weight: bold;
+
+letter-spacing: .7px;
+  
+
+}
+
+.control-group input {
+width: 100%;
+
+  
+box-sizing: border-box;
+
+background: #1a1c21;
+
+border: 1px solid #35383f;
+
+color: #eee;
+
+padding: 6px 7px;
+
+border-radius: 3px;
+
+font-family: monospace;
+font-size: 11px;
+
+outline: none;
+  
+
+}
+
+.control-group input:focus {
+border-color: #ff9d42;
+}
+
+/* ============================================================
+ACTION BUTTONS
+============================================================ */
+
+.actions-section {
+display: flex;
+flex-direction: column;
+
+  
+gap: 6px;
+
+background: rgba(255,157,66,.025);
+  
+
+}
+
+.actions-section button {
+width: 100%;
+box-sizing: border-box;
+
+  
+padding: 8px 10px;
+
+border-radius: 3px;
+
+font-size: 9px;
+
+letter-spacing: .7px;
+  
+
+}
+
+.forge-button {
+background: #ff9d42;
+color: #080808;
+}
+
+.forge-button:hover {
+background: #ffb45f;
+}
+
+.export-button {
+background: #282b31;
+color: #ff9d42;
+
+  
+border: 1px solid #484b51;
+  
+
+}
+
+.export-button:hover {
+background: #34373e;
+}
+
+/* ============================================================
+CHECKBOX ROWS
+============================================================ */
+
+.check-row {
+display: flex;
+
+  
+align-items: center;
+
+gap: 8px;
+
+min-height: 24px;
+
+padding: 2px 4px;
+
+margin: 1px 0;
+
+box-sizing: border-box;
+
+color: #858a92;
+
+font-size: 9px;
+
+font-weight: normal;
+
+text-transform: none;
+
+letter-spacing: .1px;
+
+cursor: pointer;
+
+border-radius: 3px;
+
+transition:
+    background .1s ease,
+    color .1s ease;
+  
+
+}
+
+.check-row:hover {
+background: rgba(255,255,255,.035);
+color: #ddd;
+}
+
+.check-row input {
+width: 12px;
+height: 12px;
+
+  
+margin: 0;
+
+flex: 0 0 auto;
+
+accent-color: #ff9d42;
+  
+
+}
+
+.check-row span {
+white-space: nowrap;
+}
+
+.check-row b {
+opacity: .45;
+
+  
+font-weight: normal;
+  
+
+}
+
+/* ============================================================
+COLORED OPTION GROUPS
+============================================================ */
+
+.check-row.orange {
+color: #ff9d42;
+}
+
+.check-row.green {
+color: #8fba96;
+}
+
+.check-row.red {
+color: #dc6666;
+}
+
+.check-row.gold {
+color: #d2b873;
+}
+
+.check-row.orange input {
+accent-color: #ff9d42;
+}
+
+.check-row.green input {
+accent-color: #77aa82;
+}
+
+.check-row.red input {
+accent-color: #dd5555;
+}
+
+.check-row.gold input {
+accent-color: #d0af62;
+}
+
+/* ============================================================
+FLEET WORKSPACE
+============================================================ */
+
+.fleet-workspace {
+flex: 1;
+
+  
+min-width: 0;
+
+box-sizing: border-box;
+
+padding-left: 22px;
+
+overflow-x: auto;
+  
+
+}
+
+/* Small header above generated ships */
+
+.fleet-workspace-header {
+display: flex;
+
+  
+align-items: center;
+
+gap: 10px;
+
+height: 25px;
+
+margin-bottom: 8px;
+
+color: #555b64;
+
+font-size: 8px;
+font-weight: bold;
+
+letter-spacing: 1.2px;
+  
+
+}
+
+.workspace-line {
+height: 1px;
+
+  
+flex: 1;
+
+background: #24272d;
+  
+
+}
+
+/* ============================================================
+FLEET CONTAINER
+============================================================ */
+
+#fleet-container {
+display: grid;
+
+  
+margin-top: 0;
+
+justify-content: flex-start;
+
+width: max-content;
+
+box-sizing: border-box;
+  
+
+}
+
+/* ============================================================
+EXISTING SHIP CARDS
+============================================================ */
+
+.ship-card {
+background: rgba(0,0,0,.4);
+
+  
+border: 1px solid #222;
+
+border-radius: 4px;
+
+width: 120px;
+height: 120px;
+
+position: relative;
+
+box-sizing: border-box;
+
+display: flex;
+
+align-items: center;
+justify-content: center;
+
+}
+
+/* ============================================================
+TRAIT BADGE
+============================================================ */
+
+.trait-badge {
+position: absolute;
+
+bottom: 3px;
+left: 0;
+right: 0;
+
+text-align: center;
+
+font-size: 8px;
+font-weight: 900;
+
+letter-spacing: .5px;
+
+text-transform: uppercase;
+
+background: rgba(0,0,0,.75);
+
+padding: 1px 0;
+
+}
+
+
+
     </style>
     
 </head>
 <body>
 
-    <h2>🛰️ Procedural Fleet Sheet Generator</h2>
+   <!-- ============================================================
+     LEFT SIDEBAR FLEET GENERATOR CONTROLS
+============================================================ -->
 
-    <!-- MINIMALIST UNIFIED TOOLBAR: NUMBERS ON LEFT, ACTION BUTTONS IN MIDDLE, TOGGLES ON RIGHT -->
-    <div class="control-panel" style="display: flex; gap: 20px; align-items: center; justify-content: space-between; padding: 12px 18px; min-width: 950px; box-sizing: border-box; background: rgba(255, 255, 255, 0.03); border: 1px solid #333; border-radius: 6px; margin-bottom: 20px;">
-        
-        <!-- LEFT SECTOR: HORIZONTAL COMPACT NUMBER ENTRIES -->
-        <div class="inputs-row" style="display: flex; gap: 12px; align-items: center;">
-            <div class="control-group" style="display: flex; flex-direction: column; gap: 3px;">
-                <label for="input-count" style="font-size: 9px; color: #888; text-transform: uppercase; font-weight: bold; letter-spacing: 0.5px;">Ships</label>
-                <input type="number" id="input-count" value="64" min="1" max="256" style="background: #1f2128; border: 1px solid #444; color: #fff; padding: 5px 8px; border-radius: 4px; font-family: monospace; width: 55px; font-size: 11px;">
-            </div>
-            <div class="control-group" style="display: flex; flex-direction: column; gap: 3px;">
-                <label for="input-columns" style="font-size: 9px; color: #888; text-transform: uppercase; font-weight: bold; letter-spacing: 0.5px;">Cols</label>
-                <input type="number" id="input-columns" value="8" min="1" max="24" style="background: #1f2128; border: 1px solid #444; color: #fff; padding: 5px 8px; border-radius: 4px; font-family: monospace; width: 45px; font-size: 11px;">
-            </div>
-            <div class="control-group" style="display: flex; flex-direction: column; gap: 3px;">
-                <label for="input-spacing" style="font-size: 9px; color: #888; text-transform: uppercase; font-weight: bold; letter-spacing: 0.5px;">Space</label>
-                <input type="number" id="input-spacing" value="6" min="0" max="50" style="background: #1f2128; border: 1px solid #444; color: #fff; padding: 5px 8px; border-radius: 4px; font-family: monospace; width: 45px; font-size: 11px;">
-            </div>
-            <div class="control-group" style="display: flex; flex-direction: column; gap: 3px;">
-                <label for="input-rotation" style="font-size: 9px; color: #888; text-transform: uppercase; font-weight: bold; letter-spacing: 0.5px;">Rot(°)</label>
-                <input type="number" id="input-rotation" value="0" min="0" max="360" style="background: #1f2128; border: 1px solid #444; color: #fff; padding: 5px 8px; border-radius: 4px; font-family: monospace; width: 45px; font-size: 11px;">
-            </div>
-            <div class="control-group" style="display: flex; flex-direction: column; gap: 3px;">
-                <label for="input-scale" style="font-size: 9px; color: #888; text-transform: uppercase; font-weight: bold; letter-spacing: 0.5px;">Scale(%)</label>
-                <input type="number" id="input-scale" value="100" min="0" max="300" style="background: #1f2128; border: 1px solid #444; color: #fff; padding: 5px 8px; border-radius: 4px; font-family: monospace; width: 55px; font-size: 11px;">
-            </div>
-        </div>
+<div class="fleet-layout">
 
-        <!-- MIDDLE SECTOR: TIGHTLY PACKED ACTION BUTTONS -->
-        <div class="buttons-center-cluster" style="display: flex; gap: 8px; align-items: center; justify-content: center; flex-grow: 1; max-width: 340px; margin: 0 10px;">
-            <button onclick="generateFleetSheet()" style="background: #ff9d42; color: #000; border: none; padding: 8px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 10px; flex: 1; white-space: nowrap;">Forge Fleet</button>
-            <button onclick="exportFleetAsPNG()" style="background: #ff3d00; color: #fff; border: none; padding: 8px 12px; border-radius: 4px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 10px; flex: 1; white-space: nowrap;">Export PNG</button>
-            <button onclick="exportFleetAsSVG()" style="display: none;">🧬 SVG</button>
-        </div>
+<!-- SIDEBAR -->
+<aside class="fleet-sidebar">
 
-        <!-- RIGHT SECTOR: REWORKED 4-ROW COMPACT VARIATION MATRIX CONTAINER (INTUITIVE TOGGLES) -->
-        <div class="toggles-right-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px 15px; background: rgba(0,0,0,0.2); padding: 8px 12px; border-radius: 4px; border: 1px solid #222; font-size: 10px; width: max-content; box-sizing: border-box;">
-            <!-- ROW 1: ARSENAL & GLOBAL THEMING CONTROLS -->
-            <label style="display: flex; align-items: center; gap: 4px; cursor: pointer; color: #ff9d42; font-weight: bold; white-space: nowrap;">
-                <input type="checkbox" id="toggle-label" checked style="width: auto; margin: 0; transform: scale(0.85);"> Weapon Labels
-            </label>
-            <label style="display: flex; align-items: center; gap: 4px; cursor: pointer; color: #77cc99; font-weight: bold; white-space: nowrap;">
-                <input type="checkbox" id="toggle-single-color" style="width: auto; margin: 0; transform: scale(0.85);"> Single Color Scheme
-            </label>
-            <div style="display: none;"></div> <!-- Grid alignment buffer filler -->
-
-            <!-- ROW 2: SPATIAL ORIENTATION MUTATIONS POOL -->
-            <label style="display: flex; align-items: center; gap: 4px; cursor: pointer; color: #ff5555; font-weight: bold; white-space: nowrap;">
-                <input type="checkbox" id="allow-inverted" checked style="width: auto; margin: 0; transform: scale(0.85);"> Allow Inverted Wings
-            </label>
-            <label style="display: flex; align-items: center; gap: 4px; cursor: pointer; color: #ff5555; font-weight: bold; white-space: nowrap;">
-                <input type="checkbox" id="force-inverted" style="width: auto; margin: 0; transform: scale(0.85);"> Always Inverted Wings
-            </label>
-            <div style="display: none;"></div>
-
-            <!-- ROW 3: ALL INDIVIDUAL DETAILED CHASSIS WING VARIANTS -->
-            <label style="display: flex; align-items: center; gap: 4px; cursor: pointer; color: #ff5555; font-weight: bold; white-space: nowrap;">
-                <input type="checkbox" id="allow-slickback" checked style="width: auto; margin: 0; transform: scale(0.85);"> Allow Slickback (1)
-            </label>
-            <label style="display: flex; align-items: center; gap: 4px; cursor: pointer; color: #ff5555; font-weight: bold; white-space: nowrap;">
-                <input type="checkbox" id="allow-quad-pods" checked style="width: auto; margin: 0; transform: scale(0.85);"> Allow Quad Flaps (2)
-            </label>
-            <label style="display: flex; align-items: center; gap: 4px; cursor: pointer; color: #ff5555; font-weight: bold; white-space: nowrap;">
-                <input type="checkbox" id="allow-stinger" checked style="width: auto; margin: 0; transform: scale(0.85);"> Allow Stinger (3)
-            </label>
-            <label style="display: flex; align-items: center; gap: 4px; cursor: pointer; color: #ff5555; font-weight: bold; white-space: nowrap;">
-                <input type="checkbox" id="allow-triple-pods" checked style="width: auto; margin: 0; transform: scale(0.85);"> Allow Triple Pods (4)
-            </label>
-            <label style="display: flex; align-items: center; gap: 4px; cursor: pointer; color: #ff5555; font-weight: bold; white-space: nowrap;">
-                <input type="checkbox" id="allow-snub" checked style="width: auto; margin: 0; transform: scale(0.85);"> Allow Snub Wing (5)
-            </label>
-            <!-- NEW PROTOTYPE INPUT OPTIONS HOOKED UP SEAMLESSLY -->
-            <label style="display: flex; align-items: center; gap: 4px; cursor: pointer; color: #ff5555; font-weight: bold; white-space: nowrap;">
-                <input type="checkbox" id="allow-rectangular" checked style="width: auto; margin: 0; transform: scale(0.85);"> Allow Rect (6)
-            </label>
-            <label style="display: flex; align-items: center; gap: 4px; cursor: pointer; color: #ff5555; font-weight: bold; white-space: nowrap;">
-                <input type="checkbox" id="allow-v-sharp" checked style="width: auto; margin: 0; transform: scale(0.85);"> Allow Sharp V (7)
-            </label>
-
-            <div style="display: none;"></div>
-
-            <!-- ROW 4: FIXED INTUITIVE RENDER TOGGLES (Checked = Visible by default!) -->
-            <label style="display: flex; align-items: center; gap: 4px; cursor: pointer; color: #888; white-space: nowrap;">
-                <input type="checkbox" id="toggle-wings" checked style="width: auto; margin: 0; transform: scale(0.85);"> Show Wings Geometry
-            </label>
-            <label style="display: flex; align-items: center; gap: 4px; cursor: pointer; color: #888; white-space: nowrap;">
-                <input type="checkbox" id="toggle-pods" checked style="width: auto; margin: 0; transform: scale(0.85);"> Show Gun Pods
-            </label>
-            <label style="display: flex; align-items: center; gap: 4px; cursor: pointer; color: #888; white-space: nowrap;">
-                <input type="checkbox" id="toggle-hull" checked style="width: auto; margin: 0; transform: scale(0.85);"> Show Fuselage Core
-            </label>
-            <label style="display: flex; align-items: center; gap: 4px; cursor: pointer; color: #888; white-space: nowrap;">
-                <input type="checkbox" id="toggle-decals" checked style="width: auto; margin: 0; transform: scale(0.85);"> Show Decal Accents
-            </label>
-            <label style="display: flex; align-items: center; gap: 4px; cursor: pointer; color: #888; white-space: nowrap;">
-                <input type="checkbox" id="toggle-canopy" checked style="width: auto; margin: 0; transform: scale(0.85);"> Show Cockpit Visor
-            </label>
-            <label style="display: flex; align-items: center; gap: 4px; cursor: pointer; color: #888; white-space: nowrap;">
-                <input type="checkbox" id="toggle-thrusters" checked style="width: auto; margin: 0; transform: scale(0.85);"> Show Engine Jets
-            </label>
-        </div>
-
-
+    <div class="sidebar-header">
+        <div class="sidebar-title">FLEET FORGE</div>
+        <div class="sidebar-subtitle">SHIP CONFIGURATION</div>
     </div>
 
-    <!-- CENTERED FLEET CONTAINER AREA WRAPPER -->
-    <div style="display: flex; width: 100%; justify-content: center; box-sizing: border-box; padding-top: 10px;">
-        <div id="fleet-container" style="display: grid; justify-content: center;"></div>
+
+    <!-- CORE SETTINGS -->
+    <section class="sidebar-section">
+
+        <div class="section-title">CORE SETTINGS</div>
+
+        <div class="number-grid">
+
+            <div class="control-group">
+                <label for="input-count">Ships</label>
+                <input type="number" id="input-count" value="64" min="1" max="256">
+            </div>
+
+            <div class="control-group">
+                <label for="input-columns">Cols</label>
+                <input type="number" id="input-columns" value="8" min="1" max="24">
+            </div>
+
+            <div class="control-group">
+                <label for="input-spacing">Space</label>
+                <input type="number" id="input-spacing" value="6" min="0" max="50">
+            </div>
+
+            <div class="control-group">
+                <label for="input-rotation">Rot °</label>
+                <input type="number" id="input-rotation" value="0" min="0" max="360">
+            </div>
+
+            <div class="control-group full-width">
+                <label for="input-scale">Scale %</label>
+                <input type="number" id="input-scale" value="100" min="0" max="300">
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ACTIONS -->
+    <section class="sidebar-section actions-section">
+
+        <button
+            onclick="generateFleetSheet()"
+            class="forge-button">
+            Forge Fleet
+        </button>
+
+        <button
+            onclick="exportFleetAsPNG()"
+            class="export-button">
+            Export PNG
+        </button>
+
+    </section>
+
+
+    <!-- GLOBAL -->
+    <section class="sidebar-section">
+
+        <div class="section-title">GLOBAL</div>
+
+        <label class="check-row orange">
+            <input type="checkbox" id="toggle-label" checked>
+            <span>Weapon Labels</span>
+        </label>
+
+        <label class="check-row green">
+            <input type="checkbox" id="toggle-single-color">
+            <span>Single Color Scheme</span>
+        </label>
+
+        <label class="check-row red">
+            <input type="checkbox" id="allow-inverted" checked>
+            <span>Allow Inverted Wings</span>
+        </label>
+
+        <label class="check-row red">
+            <input type="checkbox" id="force-inverted">
+            <span>Always Inverted Wings</span>
+        </label>
+
+    </section>
+
+
+    <!-- WINGS -->
+    <section class="sidebar-section">
+
+        <div class="section-title red-title">
+            WING ARCHITECTURE
+        </div>
+
+        <label class="check-row red">
+            <input type="checkbox" id="allow-slickback" checked>
+            <span>Slickback <b>(1)</b></span>
+        </label>
+
+        <label class="check-row red">
+            <input type="checkbox" id="allow-quad-pods" checked>
+            <span>Quad Flaps <b>(2)</b></span>
+        </label>
+
+        <label class="check-row red">
+            <input type="checkbox" id="allow-stinger" checked>
+            <span>Stinger <b>(3)</b></span>
+        </label>
+
+        <label class="check-row red">
+            <input type="checkbox" id="allow-triple-pods" checked>
+            <span>Triple Pods <b>(4)</b></span>
+        </label>
+
+        <label class="check-row red">
+            <input type="checkbox" id="allow-snub" checked>
+            <span>Snub Wing <b>(5)</b></span>
+        </label>
+
+        <label class="check-row red">
+            <input type="checkbox" id="allow-rectangular" checked>
+            <span>Rect <b>(6)</b></span>
+        </label>
+
+        <label class="check-row red">
+            <input type="checkbox" id="allow-v-sharp" checked>
+            <span>Sharp V <b>(7)</b></span>
+        </label>
+
+    </section>
+
+
+    <!-- ENGINES -->
+    <section class="sidebar-section">
+
+        <div class="section-title gold-title">
+            ENGINE POOL
+        </div>
+
+        <label class="check-row gold">
+            <input type="checkbox" id="allow-eng-single" checked>
+            <span>Single Nozzle <b>(1)</b></span>
+        </label>
+
+        <label class="check-row gold">
+            <input type="checkbox" id="allow-eng-dual" checked>
+            <span>Dual Outboard <b>(2)</b></span>
+        </label>
+
+        <label class="check-row gold">
+            <input type="checkbox" id="allow-eng-six" checked>
+            <span>Sixpack Pill <b>(3)</b></span>
+        </label>
+
+        <label class="check-row gold">
+            <input type="checkbox" id="allow-eng-triple" checked>
+            <span>Triple Block <b>(4)</b></span>
+        </label>
+
+        <label class="check-row gold">
+            <input type="checkbox" id="allow-eng-fourpills" checked>
+            <span>Four Pills <b>(5)</b></span>
+        </label>
+
+        <label class="check-row gold">
+            <input type="checkbox" id="allow-eng-alien" checked>
+            <span>Alien Cauldron <b>(6)</b></span>
+        </label>
+
+    </section>
+
+
+    <!-- FUSELAGE 
+    <section class="sidebar-section">
+
+        <div class="section-title green-title">
+            FUSELAGE PROFILE
+        </div>
+
+        <label class="check-row green">
+            <input type="checkbox" id="allow-hull-standard" checked>
+            <span>Core Standard <b>(1)</b></span>
+        </label>
+
+        <label class="check-row green">
+            <input type="checkbox" id="allow-hull-variant" checked>
+            <span>Alternate Profile <b>(2)</b></span>
+        </label>
+
+    </section>
+-->
+
+    <!-- RENDER -->
+    <section class="sidebar-section">
+
+        <div class="section-title">
+            RENDER
+        </div>
+
+        <label class="check-row">
+            <input type="checkbox" id="toggle-wings" checked>
+            <span>Show Wings Geometry</span>
+        </label>
+
+        <label class="check-row">
+            <input type="checkbox" id="toggle-pods" checked>
+            <span>Show Gun Pods</span>
+        </label>
+
+        <label class="check-row">
+            <input type="checkbox" id="toggle-hull" checked>
+            <span>Show Fuselage Core</span>
+        </label>
+
+        <label class="check-row">
+            <input type="checkbox" id="toggle-decals" checked>
+            <span>Show Decal Accents</span>
+        </label>
+
+        <label class="check-row">
+            <input type="checkbox" id="toggle-canopy" checked>
+            <span>Show Cockpit Visor</span>
+        </label>
+
+        <label class="check-row">
+            <input type="checkbox" id="toggle-thrusters" checked>
+            <span>Show Engine Jets</span>
+        </label>
+
+    </section>
+
+</aside>
+
+
+<!-- ========================================================
+     FLEET WORKSPACE
+========================================================= -->
+
+<main class="fleet-workspace">
+
+    <div class="fleet-workspace-header">
+        <span>GENERATED FLEET</span>
+        <span class="workspace-line"></span>
     </div>
+
+    <div id="fleet-container"></div>
+
+</main>
+
+</div>
+
 
 
     <script>
@@ -889,7 +1531,7 @@
             // =========================================================================
         // SECTION 2: UPDATED DATA ROLLER (EXPANDED TO 7 WING OPTIONS)
         // =========================================================================
-        function rollProceduralCache(forceSingleColor, lockedHull, lockedTrim) {
+      function rollProceduralCache(forceSingleColor, lockedHull, lockedTrim) {
             const allowInverted = document.getElementById('allow-inverted').checked;
             const forceInverted = document.getElementById('force-inverted').checked;
             
@@ -898,9 +1540,20 @@
             const allowStinger = document.getElementById('allow-stinger').checked;
             const allowTriplePods = document.getElementById('allow-triple-pods').checked;
             const allowSnub = document.getElementById('allow-snub').checked;
-            // NEW MUTATION GATE CHECKS: Use Type 5 as a safe fallback if these elements don't exist in UI yet
             const allowRect = document.getElementById('allow-rectangular') ? document.getElementById('allow-rectangular').checked : true;
             const allowV = document.getElementById('allow-v-sharp') ? document.getElementById('allow-v-sharp').checked : true;
+
+            // --- NEW RECRUITED ENGINE UI GATE LOOKUPS ---
+            const allowEngSingle = document.getElementById('allow-eng-single') ? document.getElementById('allow-eng-single').checked : true;
+            const allowEngDual = document.getElementById('allow-eng-dual') ? document.getElementById('allow-eng-dual').checked : true;
+            const allowEngSix = document.getElementById('allow-eng-six') ? document.getElementById('allow-eng-six').checked : true;
+            const allowEngTriple = document.getElementById('allow-eng-triple') ? document.getElementById('allow-eng-triple').checked : true;
+            const allowEngFour = document.getElementById('allow-eng-fourpills') ? document.getElementById('allow-eng-fourpills').checked : true;
+            const allowEngAlien = document.getElementById('allow-eng-alien') ? document.getElementById('allow-eng-alien').checked : true;
+
+            // --- NEW RECRUITED FUSELAGE HULL UI GATE LOOKUPS ---
+            const allowHullStandard = document.getElementById('allow-hull-standard') ? document.getElementById('allow-hull-standard').checked : true;
+            const allowHullVariant = document.getElementById('allow-hull-variant') ? document.getElementById('allow-hull-variant').checked : true;
 
             const traitRoll = Math.random();
             let chosenTrait = 'STANDARD';
@@ -908,13 +1561,14 @@
             else if (traitRoll < 0.44) chosenTrait = 'SPREAD';
             else if (traitRoll < 0.66) chosenTrait = 'DOUBLE';
 
-            let wingStyle, invertWings;
+            let wingStyle, invertWings, engineLayout, noseStyle;
             let isValidSelection = false;
             let panicCounter = 0;
 
             while (!isValidSelection && panicCounter < 400) {
-                // FIXED FOR SEVEN OPTIONS: Bumped style picker from 5 up to 7!
                 wingStyle = Math.floor(Math.random() * 7) + 1; 
+                engineLayout = Math.floor(Math.random() * 6) + 1;
+                noseStyle = Math.floor(Math.random() * 2) + 1;
                 invertWings = Math.random() > 0.5;
                 panicCounter++;
 
@@ -926,7 +1580,7 @@
 
                 isValidSelection = true; 
 
-                // Evaluate individual architectural exclusion checkbox gates
+                // Evaluate individual architectural exclusion checkbox gates (Wings)
                 if (!allowSlickback && wingStyle === 1) isValidSelection = false;
                 if (!allowQuadPods && wingStyle === 2) isValidSelection = false;
                 if (!allowStinger && wingStyle === 3) isValidSelection = false;
@@ -935,10 +1589,27 @@
                 if (!allowRect && wingStyle === 6) isValidSelection = false;
                 if (!allowV && wingStyle === 7) isValidSelection = false;
 
-                // EMERGENCY PROTECTION FALLBACK
+                // Evaluate individual architectural exclusion checkbox gates (Engines)
+                if (!allowEngSingle && engineLayout === 1) isValidSelection = false;
+                if (!allowEngDual && engineLayout === 2) isValidSelection = false;
+                if (!allowEngSix && engineLayout === 3) isValidSelection = false;
+                if (!allowEngTriple && engineLayout === 4) isValidSelection = false;
+                if (!allowEngFour && engineLayout === 5) isValidSelection = false;
+                if (!allowEngAlien && engineLayout === 6) isValidSelection = false;
+
+                // Evaluate individual architectural exclusion checkbox gates (Fuselage profiles)
+                if (!allowHullStandard && noseStyle === 1) isValidSelection = false;
+                if (!allowHullVariant && noseStyle === 2) isValidSelection = false;
+
+                // EMERGENCY PROTECTION FALLBACKS (If user clears entire categories)
                 if (!allowSlickback && !allowQuadPods && !allowStinger && !allowTriplePods && !allowSnub && !allowRect && !allowV) {
                     wingStyle = 5;
-                    isValidSelection = true;
+                }
+                if (!allowEngSingle && !allowEngDual && !allowEngSix && !allowEngTriple && !allowEngFour && !allowEngAlien) {
+                    engineLayout = 1;
+                }
+                if (!allowHullStandard && !allowHullVariant) {
+                    noseStyle = 1;
                 }
             }
 
@@ -948,8 +1619,8 @@
             return {
                 wingStyle: wingStyle,      
                 decalStyle: Math.floor(Math.random() * 3) + 1,     
-                noseStyle: Math.floor(Math.random() * 2) + 1,      
-                engineLayout: Math.floor(Math.random() * 6) + 1,
+                noseStyle: noseStyle, // Updated to use the validated, checkbox-filtered fuselage result      
+                engineLayout: engineLayout, // Updated to use the validated, checkbox-filtered engine result
                 hasGunPods: Math.random() > 0.5,                   
                 invertWings: invertWings,
                 sizeMult: 0.95, 
