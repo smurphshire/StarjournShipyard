@@ -1193,8 +1193,16 @@ padding: 1px 0;
             // Main Core Fuselage Overlay
             ctx.fillStyle = '#1e1b18'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2;
             ctx.beginPath();
-            ctx.moveTo(0, noseY); ctx.bezierCurveTo(bulbWidth, noseY, bulbWidth, -15, bulbWidth, 0); ctx.bezierCurveTo(bulbWidth * 0.5, 20, 7, 28, 7, 32); ctx.bezierCurveTo(3, 36, -3, 36, -7, 32); ctx.bezierCurveTo(-bulbWidth * 0.5, 20, -bulbWidth, -15, -bulbWidth, 0); ctx.bezierCurveTo(-bulbWidth, -15, -bulbWidth, noseY, 0, noseY);
-            ctx.closePath(); ctx.fill(); ctx.stroke();
+            ctx.moveTo(0, noseY); 
+            ctx.bezierCurveTo(bulbWidth, noseY, bulbWidth, -15, bulbWidth, 0); 
+            ctx.bezierCurveTo(bulbWidth * 0.5, 20, 7, 28, 7, 32); 
+            ctx.bezierCurveTo(3, 36, -3, 36, -7, 32); 
+            ctx.bezierCurveTo(-7, 28, -bulbWidth * 0.5, 20, -bulbWidth, 0); 
+            ctx.bezierCurveTo(-bulbWidth, -15, -bulbWidth, noseY, 0, noseY); 
+            ctx.closePath(); 
+            ctx.fill(); 
+            ctx.stroke();
+
 
             // Dynamic Proportional Triangle Pinstripe (Set to your perfected 0.75 ratio)
             ctx.fillStyle = cache.trimColor;
@@ -1515,7 +1523,7 @@ padding: 1px 0;
                     ctx.restore();
                 }
 
-                drawLeftAndRightGuns(10);  // Left Wing Hardpoint
+                drawLeftAndRightGuns(12);  // Left Wing Hardpoint
                 drawLeftAndRightGuns(-12); // Right Wing Hardpoint
                 
                 ctx.restore();
